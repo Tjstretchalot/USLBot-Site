@@ -17,18 +17,18 @@ include 'pagestart.php';
         <div class="form-group row">
 	  <input type="text" class="form-control" id="search_for" aria-label="Who to search for" placeholder="Who?">
 	</div>
-	<div class="form-group row">
-	  <div class="form-check">
+	<div class="form-group row justify-content-around">
+	  <div class="form-check col-auto">
 	    <label class="form-check-label">
 	      <input class="form-check-input" type="checkbox" id="scammer-checkbox" checked> #scammer
 	    </label>
 	  </div>
-	  <div class="form-check">
+	  <div class="form-check col-auto">
 	    <label class="form-check-label">
 	      <input class="form-check-input" type="checkbox" id="sketchy-checkbox" checked> #sketchy
 	    </label>
 	  </div>
-	  <div class="form-check">
+	  <div class="form-check col-auto">
 	    <label class="form-check-label">
 	      <input class="form-check-input" type="checkbox" id="troll-checkbox" checked> #troll
 	    </label>
