@@ -13,11 +13,28 @@ include 'pagestart.php';
   <body>
     <?php include 'navigation.php'; ?>
     <div class="container mt-5">
-      <form id="search-form">
-        <div class="form-group">
+      <form action="#" method="get">
+        <div class="form-group row">
 	  <input type="text" class="form-control" id="search_for" aria-label="Who to search for" placeholder="Who?">
-	  <input type="submit" hidden="true" />
 	</div>
+	<div class="form-group row">
+	  <div class="form-check">
+	    <label class="form-check-label">
+	      <input class="form-check-input" type="checkbox" id="scammer-checkbox" checked> #scammer
+	    </label>
+	  </div>
+	  <div class="form-check">
+	    <label class="form-check-label">
+	      <input class="form-check-input" type="checkbox" id="sketchy-checkbox" checked> #sketchy
+	    </label>
+	  </div>
+	  <div class="form-check">
+	    <label class="form-check-label">
+	      <input class="form-check-input" type="checkbox" id="troll-checkbox" checked> #troll
+	    </label>
+	  </div>
+	</div>
+	<input type="submit" hidden="true" />
       </form>
     </div>
     <?php include 'footer.php'; ?>
