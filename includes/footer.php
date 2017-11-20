@@ -1,7 +1,7 @@
 <!-- Begin footer -->
 <footer class="footer">
   <div class="container-fluid text-right">
-    &copy;<?= date("Y") ?> Timothy Moore
+    <small class="text-muted mr-5">&copy;<?= date("Y") ?> Timothy Moore</span>
   </div>
 </footer>
 <!-- End footer -->
