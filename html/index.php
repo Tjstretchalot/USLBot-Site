@@ -29,6 +29,7 @@ include 'pagestart.php';
 
       <p>The most common way that you would use this website is to search if a particular user has been banned by the universal scammer list. By using the search feature in the navigation-bar you can search users by specific pre-approved tags. The USLBot maintains a complete list of all ban/unban actions that have taken place since 3 months prior to any subreddit joining the USL (3 months is how much history reddit saves), however most of these bans are not relevant to other subreddits and thus searching is restricted to pre-approved tags except by USL moderators.</p>
     </div>
+    <?php include 'footer.php'; ?>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
