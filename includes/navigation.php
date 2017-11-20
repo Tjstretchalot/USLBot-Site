@@ -1,16 +1,16 @@
 <?php
 $pages = array(
   array(
-    link => "/index.php",
-    name => "Index"
+    'link' => "/index.php",
+    'name' => "Index"
   ),
   array(
-    link => "/search.php",
-    name => "Search"
+    'link' => "/search.php",
+    'name' => "Search"
   ),
   array(
-    link => "/login.php",
-    name => "Login"
+    'link' => "/login.php",
+    'name' => "Login"
   )
 )
 ?>
