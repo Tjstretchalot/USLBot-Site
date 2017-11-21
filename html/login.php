@@ -22,14 +22,15 @@ include 'pagestart.php';
 	  <input type="password" class="form-control" id="password" aria-label="Password", placeholder="Password">
 	</div>
 	<div class="form-group row justify-content-around">
+	  <label class="radio-inline control-label col-auto">Session Duration</label>
 	  <div class="form-check col-auto">
 	    <label class="form-check-label">
-	      <input class="form-check-input" type="radio" name="durationRadios" id="permanentRadio" checked> Permanent
+	      <input class="form-check-input" type="radio" name="durationRadios" id="permanentRadio"> Permanent
 	    </label>
 	  </div>
 	  <div class="form-check col-auto">
 	    <label class="form-check-label">
-	      <input class="form-check-input" type="radio" name="durationRadios" id="30daysRadio" checked> 30 Days
+	      <input class="form-check-input" type="radio" name="durationRadios" id="30daysRadio"> 30 Days
 	    </label>
 	  </div>
 	  <div class="form-check col-auto">
