@@ -10,6 +10,8 @@
   }
 
   function echo_success($data) {
+    http_response_code(200);
+
     echo(json_encode(array(
       'success' => true,
       'data' => $data

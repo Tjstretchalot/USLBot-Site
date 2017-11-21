@@ -14,6 +14,8 @@ Response Code 4xx.
 
 ## Success
 
+Response Code 2xx
+
 ### Login Success
 
 ```json
