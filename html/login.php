@@ -13,34 +13,40 @@ include 'pagestart.php';
   </head>
   <body>
     <?php include 'navigation.php'; ?>
-    <div class="container mt-5">
-      <form id="login-form">
-        <div class="form-group row">
-	  <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username">
-	</div>
-	<div class="form-group row">
-	  <input type="password" class="form-control" id="password" aria-label="Password", placeholder="Password">
-	</div>
-	<div class="form-group row justify-content-around">
-	  <label class="radio-inline control-label col-auto">Session Duration</label>
-	  <div class="form-check col-auto">
-	    <label class="form-check-label">
-	      <input class="form-check-input" type="radio" name="durationRadios" id="permanentRadio"> Permanent
-	    </label>
+    <div class="pl-1 pr-1">
+      <div class="container mt-5">
+	<form id="login-form">
+	  <div class="form-group row">
+	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username">
 	  </div>
-	  <div class="form-check col-auto">
-	    <label class="form-check-label">
-	      <input class="form-check-input" type="radio" name="durationRadios" id="30daysRadio"> 30 Days
-	    </label>
+	  <div class="form-group row">
+	    <input type="password" class="form-control" id="password" aria-label="Password", placeholder="Password">
 	  </div>
-	  <div class="form-check col-auto">
-	    <label class="form-check-label">
-	      <input class="form-check-input" type="radio" name="durationRadios" id="1dayRadio" checked> 1 Day
-	    </label>
+	  <div class="form-group row justify-content-between ml-0 mr-0">
+	    <label class="col-sm pl-0" style="flex-grow: 1000">Session Duration</label>
+	    <div style="flex-basis: 330px; flex-grow: 1">
+	      <div class="row justify-content-between">
+		<div class="form-check col-auto">
+		  <label class="form-check-label">
+		    <input class="form-check-input" type="radio" name="durationRadios" id="permanentRadio"> Permanent
+		  </label>
+		</div>
+		<div class="form-check col-auto">
+		  <label class="form-check-label">
+		    <input class="form-check-input" type="radio" name="durationRadios" id="30daysRadio"> 30 Days
+		  </label>
+		</div>
+		<div class="form-check col-auto">
+		  <label class="form-check-label">
+		    <input class="form-check-input" type="radio" name="durationRadios" id="1dayRadio" checked> 1 Day
+		  </label>
+		</div>
+	      </div>
+	    </div>
 	  </div>
-	</div>
-	<input type="submit" class="sr-only" />
-      </form>
+	  <input type="submit" class="sr-only" />
+	</form>
+      </div>
     </div>
     <?php include 'footer.php'; ?>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
