@@ -6,7 +6,7 @@
    * @return new mysqli connection
    */
   function create_db_connection() {
-    $conn = new mysqli("localhost", getenv("USLSITE_MYSQL_USER"), getenv("USLSITE_MYSQL_PASS"), "usl");  
+    $conn = new mysqli("localhost", $_SERVER["USLSITE_MYSQL_USER"], $_SERVER["USLSITE_MYSQL_PASS"], "usl");  
 
     if($conn->connect_errno) {
       error_log("Failed to connect to mysql database! Err No: " . $conn->connect_errno . ", Message: " . $conn->connect_error);
