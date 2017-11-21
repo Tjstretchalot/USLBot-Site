@@ -44,7 +44,9 @@ include 'pagestart.php';
 	      </div>
 	    </div>
 	  </div>
-	  <input type="submit" class="sr-only" />
+	  <div class="form-group row">
+	    <button type="submit" class="col-auto btn btn-primary">Submit</button>
+	  </div>
 	</form>
       </div>
     </div>
