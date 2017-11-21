@@ -38,7 +38,6 @@
 	$insert_expires_at = date('Y-m-d H:i:s', $insert_expires_at);
       }
 
-      if(gettype($created_at)
       $err_prefix = 'SiteSessionMapping#create_and_save';
       check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare('INSERT INTO site_sessions (session_id, person_id, created_at, expires_at) VALUES (?, ?, ?, ?)');
       check_db_error($sql_conn, $err_prefix, $stmt->bind_param('siss', $session_id, $person_id, $insert_created_at, $insert_expires_at));
