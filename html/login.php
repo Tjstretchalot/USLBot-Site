@@ -23,7 +23,7 @@ include 'pagestart.php';
 	    <input type="password" class="form-control" id="password" aria-label="Password", placeholder="Password">
 	  </div>
 	  <div class="form-group row justify-content-between ml-0 mr-0">
-	    <label class="col-sm pl-0" style="flex-grow: 1000">Session Duration</label>
+	    <label class="font-weight-bold col-sm pl-0" style="flex-grow: 1000">Session Duration</label>
 	    <div style="flex-basis: 330px; flex-grow: 1">
 	      <div class="row justify-content-between">
 		<div class="form-check col-auto">
