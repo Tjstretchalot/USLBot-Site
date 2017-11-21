@@ -8,7 +8,7 @@
     public $created_at;
     public $expires_at;
 
-    public SiteSession($id, $session_id, $person_id, $created_at, $expires_at) {
+    public function __construct($id, $session_id, $person_id, $created_at, $expires_at) {
       $this->id = $id;
       $this->session_id = $session_id;
       $this->person_id = $person_id;
