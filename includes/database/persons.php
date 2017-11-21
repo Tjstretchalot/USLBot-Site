@@ -29,7 +29,7 @@
     public static function fetch_by_id($sql_conn, $id) {
       $err_prefix = "PersonMapping#fetch_by_id";
       check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("SELECT * FROM persons WHERE id=?"));
-      check_db_error($sql_conn, $err_prefix, $stmt->bind_param("i", $id))
+      check_db_error($sql_conn, $err_prefix, $stmt->bind_param("i", $id));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
       check_db_error($sql_conn, $err_prefix, $res = $stmt->get_result());
 
