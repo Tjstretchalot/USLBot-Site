@@ -16,7 +16,6 @@ include 'pagestart.php';
     <div class="pl-1 pr-1">
       <div class="container mt-5">
         <div class="container-fluid mt-5 mb-5 ml-5 mr-5" id="statusText"></div>
-	</div>
 	<form id="login-form">
 	  <div class="form-group row">
 	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username">
