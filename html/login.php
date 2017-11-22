@@ -47,9 +47,6 @@ include 'pagestart.php';
 	    </div>
 	  </div>
 	  <div class="form-group row">
-	    <p class="form-text">Don't have an account? <a href="/create_account.php">Go here to create one</a></p>
-	  </div>
-	  <div class="form-group row">
 	    <button type="submit" class="col-auto btn btn-primary">Submit</button>
 	  </div>
 	</form>
