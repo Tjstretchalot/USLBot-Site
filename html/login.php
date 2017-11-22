@@ -84,7 +84,9 @@ include 'pagestart.php';
 	  statusText.removeClass("bg-danger").removeClass("bg-success");
 	  statusText.addClass("bg-info");
 	  statusText.html("<span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Logging in...");
-	  statusText.removeAttr("hidden");
+	  if(statusText.is(":hidden")) {
+	    statusText.slideToggle();
+	  }
 	  $.post("/api/login.php", { username: username, password: password, duration: duration }, function(data, stat) {
 	    window.location.href = "https://universalscammerlist.com";
 	  }).fail(function(xhr) {
@@ -99,7 +101,9 @@ include 'pagestart.php';
 	    statusText.addClass("bg-danger");
 	    statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
 	    setTimeout(function() {
-	      statusText.attr('hidden', true);
+	      if(!statusText.is(":hidden")) {
+		statusText.slideToggle();
+	      }
 	    }, 5000);
 	  });
 	}else {
