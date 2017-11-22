@@ -15,7 +15,7 @@ include 'pagestart.php';
     <?php include 'navigation.php'; ?>
     <div class="pl-1 pr-1">
       <div class="container mt-5">
-        <div class="container-fluid pt-3 pb-3 p3-5 pr-3 mb-2" id="statusText" hidden></div>
+        <div class="container-fluid pt-3 pb-3 p3-5 pr-3 mb-2 alert" id="statusText" style="display: none"></div>
 	<form id="login-form">
 	  <div class="form-group row">
 	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username">
@@ -77,14 +77,14 @@ include 'pagestart.php';
 	}
 
 	$("#username").removeClass("is-invalid");
-	$("#password").removeClass("is-invalid");
+        $("#password").removeClass("is-invalid");
 
 	if (username && password && duration) {
 	  var statusText = $("#statusText");
-	  statusText.removeClass("bg-danger").removeClass("bg-success");
-	  statusText.addClass("bg-info");
+	  statusText.removeClass("alert-danger").removeClass("alert-success");
+	  statusText.addClass("alert-info");
 	  statusText.html("<span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Logging in...");
-	  if(statusText.is(":hidden")) {
+	  if(!statusText.is(":visible")) {
 	    statusText.slideToggle();
 	  }
 	  $.post("/api/login.php", { username: username, password: password, duration: duration }, function(data, stat) {
@@ -97,11 +97,11 @@ include 'pagestart.php';
 	    var err_mess = json_resp.error_message;
 	    console.log(err_type + ": " + err_mess);
 
-	    statusText.removeClass("bg-success").removeClass("bg-info");
-	    statusText.addClass("bg-danger");
+	    statusText.removeClass("alert-success").removeClass("alert-info");
+	    statusText.addClass("alert-danger");
 	    statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
 	    setTimeout(function() {
-	      if(!statusText.is(":hidden")) {
+	      if(statusText.is(":visible")) {
 		statusText.slideToggle();
 	      }
 	    }, 5000);
