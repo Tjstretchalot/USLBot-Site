@@ -15,6 +15,8 @@ include 'pagestart.php';
     <?php include 'navigation.php'; ?>
     <div class="pl-1 pr-1">
       <div class="container mt-5">
+        <div class="container-fluid mt-5 mb-5 ml-5 mr-5" id="statusText"></div>
+	</div>
 	<form id="login-form">
 	  <div class="form-group row">
 	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username">
@@ -45,6 +47,9 @@ include 'pagestart.php';
 	    </div>
 	  </div>
 	  <div class="form-group row">
+	    <p>Don't have an account? <a href="/create_account.php">go here to create one</a></p>
+	  </div>
+	  <div class="form-group row">
 	    <button type="submit" class="col-auto btn btn-primary">Submit</button>
 	  </div>
 	</form>
@@ -62,7 +67,50 @@ include 'pagestart.php';
 
       $("#login-form").on('submit', function(e) {
 	e.preventDefault();
-	console.log('login form submitted');
+	
+	var username = $("#username").val();
+	var password = $("#password").val();
+	var duration = "forever";
+	if($("#30daysRadio").prop("checked")) {
+	  duration = "30days";
+	}else if($("#1dayRadio").prop("checked")) {
+	  duration = "1day";
+	}
+
+	$("#username").removeClass("is-invalid");
+	$("#password").removeClass("is-invalid");
+
+	if (username && password && duration) {
+	  var statusText = $("#statusText");
+	  statusText.removeClass("bg-danger").removeClass("bg-success");
+	  statusText.addClass("bg-info");
+	  statusText.html("<span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Logging in...");
+	  statusText.removeAttr("hidden");
+	  $.post("/api/login.php", { username: username, password: password, duration: duration }, function(data, stat) {
+	    window.location.href = "https://universalscammerlist.com";
+	  }).fail(function(xhr) {
+	    console.log(xhr.responseJSON);
+
+	    var json_resp = xhr.responseJSON;
+	    var err_type = json_resp.error_type;
+	    var err_mess = json_resp.error_message;
+	    console.log(err_type + ": " + err_mess);
+
+	    statusText.removeClass("bg-success").removeClass("bg-info");
+	    statusText.addClass("bg-danger");
+	    statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
+	    setTimeout(function() {
+	      statusText.attr('hidden', true);
+	    }, 5000);
+	  });
+	}else {
+	  if (!username) {
+	    $("#username").addClass("is-invalid");
+	  }
+	  if (!password) {
+	    $("#password").addClass("is-invalid");
+	  }
+	}
       });
     </script>
   </body>

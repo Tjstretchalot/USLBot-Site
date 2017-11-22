@@ -65,13 +65,17 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $session_id = bin2hex(random_bytes(32));
   $expires_at = null;
+  $cookie_expires_at = time() + (60 * 60 * 24 * 365 * 10); // 10 years
   if($duration === '30days') {
     $expires_at = time() + 60 * 60 * 24 * 30;
+    $cookie_expires_at = $expires_at;
   }elseif($duration === '1day') {
     $expires_at = time() + 60 * 60 * 24;
+    $cookie_expires_at = $expires_at;
   }
 
-  $session = SiteSessionsMapping::create_and_save($conn, $session_id, $person->id, time(), $expires_at); 
+  $session = SiteSessionsMapping::create_and_save($conn, $session_id, $person->id, time(), $expires_at);
+  setcookie('session_id', $session_id, $cookie_expires_at, '/'); 
   echo_success(array('session_id' => $session_id));
 }else {
   echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a POST request at this endpoint');
