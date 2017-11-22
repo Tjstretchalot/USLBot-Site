@@ -18,7 +18,7 @@ include 'pagestart.php';
 	<form id="login-form">
 	  <div class="form-group row">
 	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username" aria-describedby="usernameHelpBlock">
-	    <small id="usernameHelpBlock" class="form-text text-muted">This will match your reddit username.</small>
+	    <small id="usernameHelpBlock" class="form-text text-muted">This will match your reddit username. You will need to <a href="/create_account.php">register your account</a> here first.</small>
 	  </div>
 	  <div class="form-group row">
 	    <input type="password" class="form-control" id="password" aria-label="Password", placeholder="Password" aria-describedby="passwordHelpBlock">
