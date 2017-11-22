@@ -15,7 +15,7 @@ include 'pagestart.php';
     <?php include 'navigation.php'; ?>
     <div class="pl-1 pr-1">
       <div class="container mt-5">
-        <div class="container-fluid pt-5 pb-5 pl-5 pr-5" id="statusText" hidden></div>
+        <div class="container-fluid pt-3 pb-3 p3-5 pr-3 mb-2" id="statusText" hidden></div>
 	<form id="login-form">
 	  <div class="form-group row">
 	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username">
