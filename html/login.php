@@ -1,4 +1,3 @@
-
 <?php
 include 'pagestart.php';
 ?>
@@ -18,10 +17,12 @@ include 'pagestart.php';
         <div class="container-fluid alert" id="statusText" style="display: none"></div>
 	<form id="login-form">
 	  <div class="form-group row">
-	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username">
+	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username" aria-describedby="usernameHelpBlock">
+	    <small id="usernameHelpBlock" class="form-text text-muted">This will match your reddit username.</small>
 	  </div>
 	  <div class="form-group row">
-	    <input type="password" class="form-control" id="password" aria-label="Password", placeholder="Password">
+	    <input type="password" class="form-control" id="password" aria-label="Password", placeholder="Password" aria-describedby="passwordHelpBlock">
+	    <small id="passwordHelpBlock" class="form-text text-muted">This is at least 8 characters and is not necessarily the same as your reddit password.</small>
 	  </div>
 	  <div class="form-group row justify-content-between ml-0 mr-0">
 	    <label class="font-weight-bold col-sm pl-0" style="flex-grow: 1000">Session Duration <a href="#" data-toggle="tooltip" title="How long before you are forced to login again? Logging out will always delete your session." data-placement="top">&#x1f6c8;</a></label>
@@ -46,7 +47,7 @@ include 'pagestart.php';
 	    </div>
 	  </div>
 	  <div class="form-group row">
-	    <p>Don't have an account? <a href="/create_account.php">go here to create one</a></p>
+	    <p class="form-text">Don't have an account? <a href="/create_account.php">Go here to create one</a></p>
 	  </div>
 	  <div class="form-group row">
 	    <button type="submit" class="col-auto btn btn-primary">Submit</button>
