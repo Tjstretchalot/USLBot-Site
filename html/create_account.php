@@ -18,7 +18,7 @@ include 'pagestart.php';
 	<form id="create-account-form">
 	  <div class="form-group row">
 	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username" aria-describedby="usernameHelpBlock">
-	    <small id="usernameHelpBlock" class="form-text text-muted">Your reddit password. A message will be sent to this reddit account to confirm your identity.</small>
+	    <small id="usernameHelpBlock" class="form-text text-muted">Your reddit username. A message will be sent to this reddit account to confirm your identity and give you next steps.</small>
 	  </div>
 	  <div class="form-group row">
 	    <button type="submit" class="col-auto btn btn-primary">Submit</button>
