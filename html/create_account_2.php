@@ -18,7 +18,7 @@ include 'pagestart.php';
 	<form id="create-account-form">
 	  <div class="form-group row">
 	    <input type="number" class="form-control" id="user-id" aria-label="User ID" placeholder="User ID" aria-describedby="useridHelpBlock" min="1" step="1" required>
-	    <small id="useridHelpBlock" class="form-text text-muted w-100">Your USL unique ID that was sent to you by the USLBot</small>
+	    <small id="useridHelpBlock" class="form-text text-muted w-100">Your USL unique ID sent to you by the USLBot</small>
 	    <div class="invalid-feedback">
 	      Please provide the ID sent to you by the USLBot
 	    </div>
