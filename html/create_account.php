@@ -54,7 +54,7 @@ include 'pagestart.php';
 	if(!statusText.is(":visible")) {
 	  statusText.slideToggle();
 	}
-	$("#submit-button").disable(true);
+	$("#submit-button").attr('disabled', true);
 
 	$.post("/api/create_account_1.php", { username: username }, function(data, stat) {
 	  statusText.fadeOut('fast', function() {
@@ -75,7 +75,7 @@ include 'pagestart.php';
 	    statusText.removeClass("alert-success").removeClass("alert-info");
 	    statusText.addClass("alert-danger");
 	    statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
-	    $("#submit-button").disable(false);
+	    $("#submit-button").removeAttr('disabled');
 	  });
 	});
       });

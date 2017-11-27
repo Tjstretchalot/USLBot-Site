@@ -85,7 +85,7 @@ include 'pagestart.php';
 	  if(!statusText.is(":visible")) {
 	    statusText.slideToggle();
 	  }
-	  $("#submit-button").disable(true);
+	  $("#submit-button").attr('disabled', true);
 	  $.post("/api/login.php", { username: username, password: password, duration: duration }, function(data, stat) {
 	    window.location.href = "https://universalscammerlist.com";
 	  }).fail(function(xhr) {
@@ -101,7 +101,7 @@ include 'pagestart.php';
 	      statusText.addClass("alert-danger");
 	      statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
 	      statusText.fadeIn('fast');
-	      $("#submit-button").disable(false);
+	      $("#submit-button").removeAttr('disabled');
 	    });
 	  });
 	}else {
