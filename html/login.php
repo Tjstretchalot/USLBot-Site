@@ -79,12 +79,12 @@ include 'pagestart.php';
 
 	if (username && password && duration) {
 	  var statusText = $("#statusText");
-	  statusText.removeClass("alert-danger").removeClass("alert-success");
-	  statusText.addClass("alert-info");
-	  statusText.html("<span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Logging in...");
-	  if(!statusText.is(":visible")) {
-	    statusText.slideToggle();
-	  }
+	  statusText.fadeOut('fast', function() {
+	    statusText.removeClass("alert-danger").removeClass("alert-success");
+	    statusText.addClass("alert-info");
+	    statusText.html("<span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Logging in...");
+	    statusText.fadeIn('fast');
+	  });
 	  $("#submit-button").attr('disabled', true);
 	  $.post("/api/login.php", { username: username, password: password, duration: duration }, function(data, stat) {
 	    window.location.href = "https://universalscammerlist.com";

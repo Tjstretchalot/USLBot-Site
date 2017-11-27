@@ -76,6 +76,7 @@ include 'pagestart.php';
 	    statusText.addClass("alert-danger");
 	    statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
 	    $("#submit-button").removeAttr('disabled');
+	    statusText.fadeIn('fast');
 	  });
 	});
       });
