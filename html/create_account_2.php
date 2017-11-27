@@ -4,7 +4,7 @@ include 'pagestart.php';
 <!doctype html>
 <html lang="en">
   <head>
-    <title>USL - Login</title>
+    <title>USL - Create Account (part 2)</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -17,8 +17,32 @@ include 'pagestart.php';
         <div class="container-fluid alert" id="statusText" style="display: none"></div>
 	<form id="create-account-form">
 	  <div class="form-group row">
-	    <input type="text" class="form-control" id="username" aria-label="Username" placeholder="Username" aria-describedby="usernameHelpBlock">
-	    <small id="usernameHelpBlock" class="form-text text-muted">Your reddit username. A message will be sent to this reddit account to confirm your identity and give you next steps.</small>
+	    <input type="number" class="form-control" id="user-id" aria-label="User ID" placeholder="User ID" aria-describedby="useridHelpBlock" min="1" step="1" required>
+	    <small id="useridHelpBlock" class="form-text text-muted">Your USL unique ID. This should have been provided to you in the message.</small>
+	    <div class="invalid-feedback">
+	      Please provide the ID sent to you by the USLBot
+	    </div>
+	  </div>
+	  <div class="form-group row">
+	    <input type="text" class="form-control" id="token" aria-label="Token" placeholder="Token" aria-describedby="tokenHelpBlock" required>
+	    <small id="tokenHelpBlock" class="form-text text-muted">The token sent to you by the USLBot</small>
+	    <div class="invalid-feedback">
+	      Please provide the token sent to you by the USLBot
+	    </div>
+	  </div>
+	  <div class="form-group row">
+	    <input type="password" class="form-control" id="password-1" aria-label="Password" aria-describedby="password1HelpBlock" pattern="[0-9a-zA-Z]{8,}$" required>
+	    <small id="password1HelpBlock" class="form-text text-muted">The new password for your USL account. Must be at least 8 characters long.</small>
+	    <div class="invalid-feedback">
+	      Please provide your new password (at least 8 characters long)
+	    </div>
+	  </div>
+	  <div class="form-group row">
+	    <input type="password" class="form-control" id="password-2" aria-label="Repeat Password" aria-describedby="password2HelpBlock" pattern="[0-9a-zA-Z]{8,}$" required>
+	    <small id="password2HelpBlock" class="form-text text-muted">Retype your password</small>
+	    <div class="invalid-feedback">
+	      Please repeat your password exactly
+	    </div>
 	  </div>
 	  <div class="form-group row">
 	    <button id="submit-button" type="submit" class="col-auto btn btn-primary">Submit</button>
@@ -32,17 +56,31 @@ include 'pagestart.php';
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 
     <script type="text/javascript">
-      $(function () {
-	  $('[data-toggle="tooltip"]').tooltip();
-      });
+      var form = $("#create-account-form");
+      form.on('submit', function(e) {
+	if (!form.checkValidity()) {
+	  e.preventDefault();
+	  e.stopPropagation();
+	  return;
+	}
 
-      $("#create-account-form").on('submit', function(e) {
+
 	e.preventDefault();
-	var username = $("#username").val();
+	var valid = true;
+	var id = parseInt($("#user-id").val());
+	var token = $("#token").val();
+	var pass1 = $("#password-1").val();
+	var pass2 = $("#password-2").val();
 
-	$("#username").removeClass("is-invalid");
-	if(!username) {
-	  $("#username").addClass("is-invalid");
+	if(pass != pass2) {
+	  $("#password-2").setCustomValidity('This does not match the other password field!');
+	  valid = false;
+	}
+
+	form.addClass('was-validated');
+
+	if(!valid) {
+	  e.stopPropagation();
 	  return;
 	}
 
@@ -56,7 +94,7 @@ include 'pagestart.php';
 	}
 	$("#submit-button").disable(true);
 
-	$.post("/api/create_account_1.php", { username: username }, function(data, stat) {
+	$.post("/api/create_account_2.php", { id: id, token: token, password: pass1 }, function(data, stat) {
 	  statusText.fadeOut('fast', function() {
 	    statusText.removeClass("alert-info").removeClass("alert-danger");
 	    statusText.addClass("alert-success");

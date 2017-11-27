@@ -25,7 +25,7 @@ include 'pagestart.php';
 	    <small id="passwordHelpBlock" class="form-text text-muted">This is at least 8 characters and is not necessarily the same as your reddit password.</small>
 	  </div>
 	  <div class="form-group row justify-content-between ml-0 mr-0">
-	    <label class="font-weight-bold col-sm pl-0" style="flex-grow: 1000">Session Duration <a href="#" data-toggle="tooltip" title="How long before you are forced to login again? Logging out will always delete your session." data-placement="top">&#x1f6c8;</a></label>
+	    <label class="font-weight-bold col-sm pl-0" style="flex-grow: 1000">Session Duration <a href="#" data-toggle="tooltip" title="How long before your session automatically expires? Logging out will always expire your session." data-placement="top">&#x1f6c8;</a></label>
 	    <div style="flex-basis: 330px; flex-grow: 1">
 	      <div class="row justify-content-between">
 		<div class="form-check col-auto">
@@ -47,7 +47,7 @@ include 'pagestart.php';
 	    </div>
 	  </div>
 	  <div class="form-group row">
-	    <button type="submit" class="col-auto btn btn-primary">Submit</button>
+	    <button id="submit-button" type="submit" class="col-auto btn btn-primary">Submit</button>
 	  </div>
 	</form>
       </div>
@@ -85,6 +85,7 @@ include 'pagestart.php';
 	  if(!statusText.is(":visible")) {
 	    statusText.slideToggle();
 	  }
+	  $("#submit-button").disable(true);
 	  $.post("/api/login.php", { username: username, password: password, duration: duration }, function(data, stat) {
 	    window.location.href = "https://universalscammerlist.com";
 	  }).fail(function(xhr) {
@@ -95,14 +96,13 @@ include 'pagestart.php';
 	    var err_mess = json_resp.error_message;
 	    console.log(err_type + ": " + err_mess);
 
-	    statusText.removeClass("alert-success").removeClass("alert-info");
-	    statusText.addClass("alert-danger");
-	    statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
-	    setTimeout(function() {
-	      if(statusText.is(":visible")) {
-		statusText.slideToggle();
-	      }
-	    }, 5000);
+	    statusText.fadeOut('fast', function() {
+	      statusText.removeClass("alert-success").removeClass("alert-info");
+	      statusText.addClass("alert-danger");
+	      statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
+	      statusText.fadeIn('fast');
+	      $("#submit-button").disable(false);
+	    });
 	  });
 	}else {
 	  if (!username) {
