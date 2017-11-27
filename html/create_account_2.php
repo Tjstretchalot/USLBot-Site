@@ -58,7 +58,7 @@ include 'pagestart.php';
     <script type="text/javascript">
       var form = $("#create-account-form");
       form.on('submit', function(e) {
-	if (!form.checkValidity()) {
+	if (!form[0].checkValidity()) {
 	  e.preventDefault();
 	  e.stopPropagation();
 	  return;
@@ -73,7 +73,7 @@ include 'pagestart.php';
 	var pass2 = $("#password-2").val();
 
 	if(pass != pass2) {
-	  $("#password-2").setCustomValidity('This does not match the other password field!');
+	  $("#password-2")[0].setCustomValidity('This does not match the other password field!');
 	  valid = false;
 	}
 
