@@ -70,7 +70,7 @@
 
     public static function update_row($sql_conn, $request) {
       $err_prefix = "RegisterAccountRequestMapping#update_row";
-      check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("UPDATE reg_account_requests SET person_id=?, token=?, consumed=?, created_at=?, sent_at=? WHERE id=?");
+      check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("UPDATE reg_account_requests SET person_id=?, token=?, consumed=?, created_at=?, sent_at=? WHERE id=?"));
       check_db_error($sql_conn, $err_prefix, $stmt->bind_param('isiss', $request->person_id, $request->token, $request->consumed, date('Y-m-d H:i:s', $request->created_at), date('Y-m-d H:i:s', $request->sent_at), $request->id));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
 
