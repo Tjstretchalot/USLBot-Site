@@ -72,7 +72,7 @@ include 'pagestart.php';
 	var pass1 = $("#password-1").val();
 	var pass2 = $("#password-2").val();
 
-	if(pass != pass2) {
+	if(pass1 != pass2) {
 	  $("#password-2")[0].setCustomValidity('This does not match the other password field!');
 	  valid = false;
 	}
