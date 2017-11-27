@@ -18,28 +18,28 @@ include 'pagestart.php';
 	<form id="create-account-form">
 	  <div class="form-group row">
 	    <input type="number" class="form-control" id="user-id" aria-label="User ID" placeholder="User ID" aria-describedby="useridHelpBlock" min="1" step="1" required>
-	    <small id="useridHelpBlock" class="form-text text-muted">Your USL unique ID. This should have been provided to you in the message.</small>
+	    <small id="useridHelpBlock" class="form-text text-muted w-100">Your USL unique ID. This should have been provided to you in the message.</small>
 	    <div class="invalid-feedback">
 	      Please provide the ID sent to you by the USLBot
 	    </div>
 	  </div>
 	  <div class="form-group row">
 	    <input type="text" class="form-control" id="token" aria-label="Token" placeholder="Token" aria-describedby="tokenHelpBlock" required>
-	    <small id="tokenHelpBlock" class="form-text text-muted">The token sent to you by the USLBot</small>
+	    <small id="tokenHelpBlock" class="form-text text-muted w-100">The token sent to you by the USLBot</small>
 	    <div class="invalid-feedback">
 	      Please provide the token sent to you by the USLBot
 	    </div>
 	  </div>
 	  <div class="form-group row">
 	    <input type="password" class="form-control" id="password-1" aria-label="Password" aria-describedby="password1HelpBlock" pattern="[0-9a-zA-Z]{8,}$" required>
-	    <small id="password1HelpBlock" class="form-text text-muted">The new password for your USL account. Must be at least 8 characters long.</small>
+	    <small id="password1HelpBlock" class="form-text text-muted w-100">The new password for your USL account. Must be at least 8 characters long.</small>
 	    <div class="invalid-feedback">
 	      Please provide your new password (at least 8 characters long)
 	    </div>
 	  </div>
 	  <div class="form-group row">
 	    <input type="password" class="form-control" id="password-2" aria-label="Repeat Password" aria-describedby="password2HelpBlock" pattern="[0-9a-zA-Z]{8,}$" required>
-	    <small id="password2HelpBlock" class="form-text text-muted">Retype your password</small>
+	    <small id="password2HelpBlock" class="form-text text-muted w-100">Retype your password</small>
 	    <div class="invalid-feedback">
 	      Please repeat your password exactly
 	    </div>
