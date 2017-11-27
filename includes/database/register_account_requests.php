@@ -60,7 +60,7 @@
 
     public static function insert_row($sql_conn, $request) {
       $err_prefix = "RegisterAccountRequestMapping#insert_row";
-      check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("INSERT INTO reg_account_requests (person_id, token, consumed, created_at, sent_at) VALUES (?, ?, ?, ?, ?)");
+      check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("INSERT INTO reg_account_requests (person_id, token, consumed, created_at, sent_at) VALUES (?, ?, ?, ?, ?)"));
       check_db_error($sql_conn, $err_prefix, $stmt->bind_param('isiss', $request->person_id, $request->token, $request->consumed, date('Y-m-d H:i:s', $request->created_at), date('Y-m-d H:i:s', $request->sent_at)));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
       $request->id = $sql_conn->insert_id;
