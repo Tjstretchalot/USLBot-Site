@@ -47,7 +47,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   $token_err_type = 'TOKEN_INVALID';
-  $token_err_mess = 'The provided token does not match our records. The link might be malformed, or the token might be expired, or the token may have already been used';
+  $token_err_mess = 'The provided token does not match our records. The link might be malformed, the token might be expired, or the token may have already been used';
 
   $conn = create_db_connection(); 
   $person = PersonMapping::fetch_by_id($conn, $id);
