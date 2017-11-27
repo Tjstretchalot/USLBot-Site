@@ -17,14 +17,14 @@ include 'pagestart.php';
         <div class="container-fluid alert" id="statusText" style="display: none"></div>
 	<form id="create-account-form">
 	  <div class="form-group row">
-	    <input type="number" class="form-control" id="user-id" aria-label="User ID" placeholder="User ID" aria-describedby="useridHelpBlock" min="1" step="1" <? if (isset($_GET["id"])) { echo "value=\"" . $_GET["id"] . "\" "; } ?>required>
+	    <input type="number" class="form-control" id="user-id" aria-label="User ID" placeholder="User ID" aria-describedby="useridHelpBlock" min="1" step="1" <?php if (isset($_GET["id"])) { echo "value=\"" . $_GET["id"] . "\" "; } ?>required>
 	    <small id="useridHelpBlock" class="form-text text-muted w-100">Your USL unique ID sent to you by the USLBot</small>
 	    <div class="invalid-feedback">
 	      Please provide the ID sent to you by the USLBot
 	    </div>
 	  </div>
 	  <div class="form-group row">
-	    <input type="text" class="form-control" id="token" aria-label="Token" placeholder="Token" aria-describedby="tokenHelpBlock" <? if (isset($_GET["token"])) { echo "value=\"" . $_GET["token"] . "\" "; } ?>required>
+	    <input type="text" class="form-control" id="token" aria-label="Token" placeholder="Token" aria-describedby="tokenHelpBlock" <?php if (isset($_GET["token"])) { echo "value=\"" . $_GET["token"] . "\" "; } ?>required>
 	    <small id="tokenHelpBlock" class="form-text text-muted w-100">The token sent to you by the USLBot</small>
 	    <div class="invalid-feedback">
 	      Please provide the token sent to you by the USLBot
