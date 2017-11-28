@@ -74,7 +74,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cookie_expires_at = $expires_at;
   }
 
-  $session = SiteSessionsMapping::create_and_save($conn, $session_id, $person->id, time(), $expires_at);
+  $session = SiteSessionMapping::create_and_save($conn, $session_id, $person->id, time(), $expires_at);
   setcookie('session_id', $session_id, $cookie_expires_at, '/'); 
   echo_success(array('session_id' => $session_id));
 }else {
