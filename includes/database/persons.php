@@ -62,9 +62,12 @@
 
     public static function update_row($sql_conn, $person) {
       $err_prefix = "PersonMapping#update_row";
+
+      $usable_created_at = date('Y-m-d H:i:s', $person->created_at);
+      $usable_updated_at = date('Y-m-d H:i:s', $person->updated_at);
       check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("UPDATE persons SET username=?, password_hash=?, email=?, auth=?, created_at=?, updated_at=? WHERE id=?"));
       check_db_error($sql_conn, $err_prefix, $stmt->bind_param('sssissi', $person->username, $person->password_hash, $person->email, $person->auth_level,
-					     date('Y-m-d H:i:s', $person->created_at), date('Y-m-d H:i:s', $person->updated_at), $person->id));
+					     $usable_created_at, $usable_updated_at, $person->id));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
 
       $stmt->close();
@@ -72,9 +75,11 @@
 
     public static function insert_row($sql_conn, $person) {
       $err_prefix = "PersonMapping#insert_row";
+      $usable_created_at = date('Y-m-d H:i:s', $person->created_at);
+      $usable_updated_at = date('Y-m-d H:i:s', $person->updated_at);
       check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("INSERT INTO persons (username, password_hash, email, auth, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)"));
       check_db_error($sql_conn, $err_prefix, $stmt->bind_param('sssiss', $person->username, $person->password_hash, $person->email, $person->auth_level,
-					     date('Y-m-d H:i:s', $person->created_at), date('Y-m-d H:i:s', $person->updated_at)));
+					     $usable_created_at, $usable_updated_at));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
 
       $person->id = $sql_conn->insert_id;

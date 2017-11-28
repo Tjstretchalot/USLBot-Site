@@ -66,8 +66,13 @@
 	$usable_sent_at = date('Y-m-d H:i:s', $request->sent_at);
       }
 
+      $usable_created_at = null;
+      if($request->created_at !== null) {
+	$usable_created_at = date('Y-m-d H:i:s', $request->created_at);
+      }
+
       check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("INSERT INTO reg_account_requests (person_id, token, consumed, created_at, sent_at) VALUES (?, ?, ?, ?, ?)"));
-      check_db_error($sql_conn, $err_prefix, $stmt->bind_param('isiss', $request->person_id, $request->token, $request->consumed, date('Y-m-d H:i:s', $request->created_at), $usable_sent_at));
+      check_db_error($sql_conn, $err_prefix, $stmt->bind_param('isiss', $request->person_id, $request->token, $request->consumed, $usable_created_at, $usable_sent_at));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
       $request->id = $sql_conn->insert_id;
 
@@ -76,8 +81,19 @@
 
     public static function update_row($sql_conn, $request) {
       $err_prefix = "RegisterAccountRequestMapping#update_row";
+
+      $usable_sent_at = null;
+      if($request->sent_at !== null) {
+	$usable_sent_at = date('Y-m-d H:i:s', $request->sent_at);
+      }
+
+      $usable_created_at = null;
+      if($request->created_at !== null) {
+	$usable_created_at = date('Y-m-d H:i:s', $request->created_at);
+      }
+
       check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("UPDATE reg_account_requests SET person_id=?, token=?, consumed=?, created_at=?, sent_at=? WHERE id=?"));
-      check_db_error($sql_conn, $err_prefix, $stmt->bind_param('isiss', $request->person_id, $request->token, $request->consumed, date('Y-m-d H:i:s', $request->created_at), date('Y-m-d H:i:s', $request->sent_at), $request->id));
+      check_db_error($sql_conn, $err_prefix, $stmt->bind_param('isiss', $request->person_id, $request->token, $request->consumed, $usable_created_at, $usable_sent_at, $request->id));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
 
       $stmt->close();
