@@ -7,12 +7,20 @@ $pages = array(
   array(
     'link' => "/search.php",
     'name' => "Search"
-  ),
-  array(
-    'link' => "/login.php",
-    'name' => "Login"
   )
 )
+
+if($logged_in_person === null) {
+  $pages[] = array(
+    'link' => "/login.php",
+    'name' => "Login"
+  );
+}else {
+  $pages[] = array(
+    'link' => '/logout.php',
+    'name' => 'Logout'
+  );
+}
 ?>
 <!-- navigation start -->
 

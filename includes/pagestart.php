@@ -7,7 +7,7 @@
 
   $logged_in_person = null;
   if(isset($_COOKIE['usl_session_id'])) {
-    $session = SiteSessionMapping::fetch_by_session_id($_COOKIE['usl_session_id']);
+    $session = SiteSessionMapping::fetch_by_session_id($conn, $_COOKIE['usl_session_id']);
 
     if($session === null || $session->expires_at <= time()) {
       unset($_COOKIE['usl_session_id']);
