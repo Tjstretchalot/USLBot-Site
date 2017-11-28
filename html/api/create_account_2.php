@@ -52,6 +52,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   $conn = create_db_connection(); 
   $person = PersonMapping::fetch_by_id($conn, $id);
   if($person === null) {
+    error_log('Person is null for ID ' . $id);
     echo_fail(400, $token_err_type, $token_err_mess);
     $conn->close();
     return;
@@ -60,24 +61,28 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   /* VALIDATING AUTHORIZATION */
   $request = RegisterAccountRequestMapping::fetch_latest_by_person_id($conn, $id);
   if($request === null) {
+    error_log('Request is null for id ' . $id);
     echo_fail(400, $token_err_type, $token_err_mess);
     $conn->close();
     return;
   }
 
   if($request->consumed !== 0) {
+    error_log('Request is already consumed for id ' . $id);
     echo_fail(400, $token_err_type, $token_err_mess);
     $conn->close();
     return;
   }
 
   if($request->sent_at === null) {
+    error_log('Request has not been sent for id ' . $id);
     echo_fail(400, $token_err_type, $token_err_mess);
     $conn->close();
     return;
   }
 
   if($token !== $request->token) {
+    error_log('Token does not match for id ' . $id);
     echo_fail(400, $token_err_type, $token_err_mess);
     $conn->close();
     return;
