@@ -77,7 +77,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     return;
   }
 
-  if(!password_verify($token, $request->token)) {
+  if($token !== $request->token) {
     echo_fail(400, $token_err_type, $token_err_mess);
     $conn->close();
     return;

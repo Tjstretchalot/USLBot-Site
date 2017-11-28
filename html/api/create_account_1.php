@@ -38,7 +38,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   /* PERFORMING REQUEST */
   $token = bin2hex(random_bytes(32));
-  $request = new RegisterAccountRequest(-1, $person->id, password_hash($token, PASSWORD_DEFAULT), 0, time(), null);
+  $request = new RegisterAccountRequest(-1, $person->id, $token, 0, time(), null);
   RegisterAccountRequestMapping::insert_row($conn, $request);
   $conn->close();
   echo_success($success_args);
