@@ -8,7 +8,7 @@ $pages = array(
     'link' => "/search.php",
     'name' => "Search"
   )
-)
+);
 
 if($logged_in_person === null) {
   $pages[] = array(
