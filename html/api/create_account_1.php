@@ -19,7 +19,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   /* VALIDATING AUTHORIZATION */
-  $success_args = array('message' => 'If that account is registered and no password reset request has been made recently, then a message will be sent to that account in the next few minutes with a link to reset your password.');
+  $success_args = array('message' => 'If that account is registered and no account request has been made recently, then a message will be sent to that account in the next few minutes with a link to claim your account.');
 
   $conn = create_db_connection(); 
   $person = PersonMapping::fetch_by_username($conn, $username);
