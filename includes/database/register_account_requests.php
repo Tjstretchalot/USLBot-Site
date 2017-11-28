@@ -93,7 +93,7 @@
       }
 
       check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("UPDATE reg_account_requests SET person_id=?, token=?, consumed=?, created_at=?, sent_at=? WHERE id=?"));
-      check_db_error($sql_conn, $err_prefix, $stmt->bind_param('isiss', $request->person_id, $request->token, $request->consumed, $usable_created_at, $usable_sent_at, $request->id));
+      check_db_error($sql_conn, $err_prefix, $stmt->bind_param('isissi', $request->person_id, $request->token, $request->consumed, $usable_created_at, $usable_sent_at, $request->id));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
 
       $stmt->close();
