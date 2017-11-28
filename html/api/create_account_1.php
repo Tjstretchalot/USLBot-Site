@@ -25,9 +25,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   $person = PersonMapping::fetch_by_username($conn, $username);
   
   if($person === null) {
-    echo_success($success_args);
-    $conn->close();
-    return;
+    $person = new Person(-1, $username, null, null, 0, time(), time());
+    PersonMapping::insert_row($conn, $person);
   }
 
   $latest_request = RegisterAccountRequestMapping::fetch_latest_by_person_id($conn, $person->id);
