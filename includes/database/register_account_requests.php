@@ -44,7 +44,7 @@
     public static function fetch_latest_by_person_id($sql_conn, $person_id) {
       $err_prefix = "RegisterAccountRequestMapping#fetch_latest_by_person_id";
       check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("SELECT * FROM reg_account_requests WHERE person_id=? ORDER BY created_at ASC LIMIT 1"));
-      check_db_error($sql_conn, $err_prefix, $stmt->bind_param("i", $id));
+      check_db_error($sql_conn, $err_prefix, $stmt->bind_param("i", $person_id));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
       check_db_error($sql_conn, $err_prefix, $res = $stmt->get_result());
 
