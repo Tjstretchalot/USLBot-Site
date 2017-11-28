@@ -13,7 +13,7 @@
       unset($_COOKIE['session_id']);
       setcookie('session_id', '', time() - 3600, '/');
     }else {
-      $logged_in_person = PersonMapping::fetch_by_id($session->person_id); 
+      $logged_in_person = PersonMapping::fetch_by_id($conn, $session->person_id); 
     }
   }
 ?>
