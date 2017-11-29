@@ -55,11 +55,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if($person === null) {
     echo_fail(400, 'BAD_PASSWORD', 'That username/password combination is not correct.');
+    $conn->close();
     return;
   }
 
   if($person->password_hash === null || !password_verify($password, $person->password_hash)) {
     echo_fail(400, 'BAD_PASSWORD', 'That username/password combination is not correct.');
+    $conn->close();
     return;
   }
 
@@ -77,6 +79,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   $session = SiteSessionMapping::create_and_save($conn, $session_id, $person->id, time(), $expires_at);
   setcookie('session_id', $session_id, $cookie_expires_at, '/'); 
   echo_success(array('session_id' => $session_id));
+  $conn->close();
 }else {
   echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a POST request at this endpoint');
 }
