@@ -22,7 +22,7 @@ include 'pagestart.php';
 	  </div>
 	  <div class="form-group row">
 	    <input type="password" class="form-control" id="password" aria-label="Password", placeholder="Password" aria-describedby="passwordHelpBlock">
-	    <small id="passwordHelpBlock" class="form-text text-muted">This is at least 8 characters and is not necessarily the same as your reddit password.</small>
+	    <small id="passwordHelpBlock" class="form-text text-muted">This is at least 8 characters and is not necessarily the same as your reddit password. You can <a href="/reset_password.php">reset your password</a> if necessary.</small>
 	  </div>
 	  <div class="form-group row justify-content-between ml-0 mr-0">
 	    <label class="font-weight-bold col-sm pl-0" style="flex-grow: 1000">Session Duration <a href="#" data-toggle="tooltip" title="How long before your session automatically expires? Logging out will always expire your session." data-placement="top">&#x1f6c8;</a></label>
