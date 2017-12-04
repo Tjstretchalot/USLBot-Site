@@ -115,6 +115,46 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   $is_searching_all = in_array('all', $hashtags);
 
+  // Getting the traditional scammer list information
+  $sql = 'SELECT * FROM traditional_scammers WHERE person_id=?';
+  check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
+  check_db_error($conn, $err_prefix, $stmt->bind_param('i', $person->id));
+  check_db_error($conn, $err_prefix, $stmt->execute());
+  check_db_error($conn, $err_prefix, $res = $stmt->get_result());
+  $row = $res->fetch_assoc();
+  $res->close();
+  $stmt->close();
+  if($row !== null) {
+    $conn->close();
+    $meets_reqs = $is_searching_all;
+    if(!$meets_reqs) {
+      foreach($hashtags as $tag) {
+        if(strpos($desc, $tag) !== false) {
+	  $meets_reqs = true;
+	  break;
+	}
+      } 
+    }
+    if($meets_reqs) {
+      if($format === 1) {
+	echo_success(array( 'banned' => true ));
+	return;
+      }else {
+	echo_success(array( 'grandfathered' => true, 'description' => $row['description'], 'time' => strtotime($row['created_at']) ));
+	return;
+      }
+    }else {
+      if($format === 1) {
+	echo_success(array( 'banned' => false ));
+	return;
+      }else {
+	echo_success(array( 'history' => array() ));
+	return;
+      }
+    }
+  }
+  
+
   // Getting all ban histories, unfiltered
   $sql = 'SELECT * FROM ban_histories WHERE banned_person_id=?';
   check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
@@ -148,10 +188,21 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   // Cleansing the ban_history of any bans that don't meet the search
   // criteria, and keeping track of the ones we removed 
   $invalid_bhs = array();
+  $changed_bhs = array();
   if(!$is_searching_all) {
     $valid_bhs = array();
     foreach($ban_history as $bh) {
+      if(substr($bh['bh']['ban_details'], 0, strlen('changed to')) === 'changed to') {
+	$changed_bhs[] = $bh;
+	continue;
+      }
+
       $desc = $bh['bh']['ban_description'];
+
+      if($desc === null) {
+	$invalid_bhs[] = $bh;
+	continue;
+      }
 
       $found_tag = false;
       foreach($hashtags as $tag) {
@@ -167,6 +218,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 	$invalid_bhs[] = $bh;
       }
     }
+
     $ban_history = $valid_bhs;
   }
 
@@ -188,6 +240,46 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $bh['hma'] = $row;
     $res->close();
     $stmt->close();
+  }
+
+  // Assigned the changed_bhs to either invalid or valid bhs
+  foreach($changed_bhs as $bh) {
+    if($is_searching_all) {
+      $valid_bhs[] = $bh;
+      continue;
+    }
+    if(!isset($bh['hma']['occurred_at__php'])) {
+      $bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
+    }
+
+    $most_applicable_bh = null;
+    $nonchanged_bhs = $invalid_bhs + $ban_history;
+
+    foreach($nonchanged_bhs as $bh2) {
+      if(!isset($bh2['hma']['occurred_at__php'])) {
+	$bh2['hma']['occurred_at__php'] = strtotime($bh2['hma']['occurred_at']);
+      }
+
+      if($bh2['hma']['monitored_subreddit_id'] !== $bh['hma']['monitored_subreddit_id']) {
+	continue;
+      }
+
+      if($bh2['hma']['occurred_at__php'] > $bh['hma']['occurred_at__php']) {
+	continue;
+      }
+
+      if($most_applicable_bh !== null && $bh2['hma']['occurred_at__php'] < $most_applicable_bh['hma']['occurred_at__php']) {
+	continue;
+      }
+
+      $most_applicable_bh = $bh2;
+    }
+
+    if($most_applicable_bh === null || in_array($most_applicable_bh, $invalid_bhs)) {
+      $invalid_bhs[] = $bh;
+    }else {
+      $valid_bhs[] = $bh;
+    }
   }
 
   // Fetching the unfiltered list of unban actions
