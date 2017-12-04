@@ -15,6 +15,7 @@ include 'pagestart.php';
   <body>
     <?php include 'navigation.php'; ?>
     <div class="container mt-5">
+      <div class="container-fluid alert" id="statusText" style="display: none"></div>
       <form id="search-form">
         <div class="form-group row">
           <input type="text" class="form-control" id="search_for" aria-label="Who to search for" placeholder="Who?">
@@ -88,6 +89,7 @@ include 'pagestart.php';
         $("#search_for").attr('disabled', true);
 
         $.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: 2 }, function(data, stat) {
+	  $("#status-text").slideUp('fast');
 	  $("#person-name").fadeOut('fast', function() {
 	    $("#person-name").html(data.data.person);
 	    $("#person-name").fadeIn('fast');
@@ -122,7 +124,9 @@ include 'pagestart.php';
 
 	    $("#output-grandfathered").slideUp('fast', function() {
 	      $("#gfather-banned-desc").html(data.data.description);
-	      $("#output-grandfathered").slideDown('fast');
+	      $("#output-grandfathered").slideDown('fast', function() {
+                $("#search_for").removeAttr('disabled');
+	      });
 	    });
 	  }
         }).fail(function(xhr) {
