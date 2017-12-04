@@ -59,7 +59,7 @@ include 'pagestart.php';
 
 	$("#search_for").attr('disabled', true);
 
-	$.get("/api/query.php", { query: $("#search_for").val(), hashtags.join(','), format: 2 }, function(data, stat) {
+	$.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: 2 }, function(data, stat) {
 	  console.log(data);
 	}).fail(function(xhr) {
 	  console.log(xhr.responseJSON);
