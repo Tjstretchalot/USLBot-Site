@@ -1,4 +1,6 @@
 <?php
+  $MODERATOR_PERMISSION = 5;
+
   function echo_fail($resp_code, $err_type, $err_mess) {
     http_response_code($resp_code);
     header('Content-Type: application/json');

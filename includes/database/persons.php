@@ -60,6 +60,23 @@
       return $person;
     }
 
+    public static function fetch_like_username($sql_conn, $username) {
+      $err_prefix = "PersonMapping#fetch_like_username";
+      check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("SELECT * FROM persons WHERE username LIKE ?"));
+      check_db_error($sql_conn, $err_prefix, $stmt->bind_param('s', $username));
+      check_db_error($sql_conn, $err_prefix, $stmt->execute());
+      check_db_error($sql_conn, $err_prefix, $res = $stmt->get_result());
+
+      $person = null;
+      $row = $res->fetch_assoc();
+      if($row) {
+	$person = Person::from_assoc_row($row);
+      }
+      $res->close();
+      $stmt->close();
+      return $person;
+    }
+
     public static function update_row($sql_conn, $person) {
       $err_prefix = "PersonMapping#update_row";
 
