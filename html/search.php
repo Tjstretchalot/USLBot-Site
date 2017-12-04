@@ -100,7 +100,7 @@ include 'pagestart.php';
                 new_html += "</tr>";
               }
               tbody.html(new_html);
-              table.footable({showToggle: true});
+              table.footable();
               wrapper.slideDown('fast', function() { 
                 $("#search_for").removeAttr('disabled');
               });
