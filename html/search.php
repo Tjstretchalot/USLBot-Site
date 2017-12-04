@@ -64,6 +64,9 @@ include 'pagestart.php';
     <script src="js/footable.min.js"></script>
 
     <script type="text/javascript">
+      jQuery(function($){
+	$('.table').footable();
+      });
       $("#search-form").on('submit', function(e) {
         e.preventDefault();
         
