@@ -14,8 +14,8 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   /* 
    * Format options:
-   *  1: ultra-compact: returns things like { success: true, data: { banned: true } }
-   *  2: compact: returns things like { success: true, data: { history: { { kind: 'ban', subreddit: 'universalscammerlist', description: '#scammer', details: 'permanent', time: 1512412103 } } } }
+   *  1: ultra-compact: returns things like { success: true, data: { person: 'john', banned: true } }
+   *  2: compact: returns things like { success: true, data: { person: 'john', grandfathered: false, history: { { kind: 'ban', subreddit: 'universalscammerlist', description: '#scammer', details: 'permanent', time: 1512412103 } } } }
    */
   $format = 1; 
 
@@ -104,11 +104,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   if($person === null) {
     if($format === 1) {
-      echo_success(array( 'banned' => false));
+      echo_success(array( 'person' => str_replace('%', '', $query), 'banned' => false));
       $conn->close();
       return;
     }else {
-      echo_success(array( 'history' => array()));
+      echo_success(array( 'person' => str_replace('%', '', $query), 'grandfathered' => false, 'history' => array()));
       $conn->close();
       return;
     }
@@ -138,18 +138,18 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     if($meets_reqs) {
       if($format === 1) {
-	echo_success(array( 'banned' => true ));
+	echo_success(array( 'person' => $person->username, 'banned' => true ));
 	return;
       }else {
-	echo_success(array( 'grandfathered' => true, 'description' => $row['description'], 'time' => strtotime($row['created_at']) ));
+	echo_success(array( 'person' => $person->username, 'grandfathered' => true, 'description' => $row['description'], 'time' => strtotime($row['created_at']) ));
 	return;
       }
     }else {
       if($format === 1) {
-	echo_success(array( 'banned' => false ));
+	echo_success(array( 'person' => $person->username, 'banned' => false ));
 	return;
       }else {
-	echo_success(array( 'history' => array() ));
+	echo_success(array( 'person' => $person->username, 'grandfathered' => false, 'history' => array() ));
 	return;
       }
     }
@@ -176,11 +176,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   // which case we should return unpaired unbans)
   if(count($ban_history) === 0) {
     if($format === 1) {
-      echo_success(array( 'banned' => false ));
+      echo_success(array( 'person' => $person->username, 'banned' => false ));
       $conn->close();
       return;
     }elseif(!$is_searching_all) {
-      echo_success(array( 'history' => array() ));
+      echo_success(array( 'person' => $person->username, 'grandfathered' => false, 'history' => array() ));
       $conn->close();
       return;
     }
@@ -321,7 +321,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   // At this point we can return for the format type 1
   if($format === 1) {
     if(count($ban_history) > 0 && count($unban_history) === 0) {
-      echo_success(array('banned' => true));
+      echo_success(array('person' => $person->username, 'banned' => true));
       $conn->close();
       return;
     }
@@ -335,7 +335,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       $latest_unban_time = max($latest_unban_time, strtotime($ubh['hma']['occurred_at']));
     }
 
-    echo_success(array('banned' => ($latest_ban_time > $latest_unban_time)));
+    echo_success(array('person' => $person->username, 'banned' => ($latest_ban_time > $latest_unban_time)));
     $conn->close();
     return;
   }
@@ -397,7 +397,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   if($is_searching_all) {
     fetch_subs_bh($conn, $ban_history);
     fetch_subs_ubh($conn, $unban_history);
-    echo_success(array('history' => create_combined($ban_history, $unban_history)));
+    echo_success(array('person' => $person->username, 'grandfathered' => false, 'history' => create_combined($ban_history, $unban_history)));
     $conn->close();
     return;
   }
@@ -434,7 +434,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
   fetch_subs_bh($conn, $ban_history);
   fetch_subs_ubh($conn, $valid_ubhs);
-  echo_success(array('history' => create_combined($ban_history, $valid_ubhs)));
+  echo_success(array('person' => $person->username, 'grandfathered' => false, 'history' => create_combined($ban_history, $valid_ubhs)));
   $conn->close();
   return;
 }else {
