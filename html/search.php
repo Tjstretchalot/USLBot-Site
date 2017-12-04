@@ -36,17 +36,39 @@ include 'pagestart.php';
 	</div>
 	<input type="submit" class="sr-only" />
       </form>
+      <hr />
+      <div id="output-not-grandfathered">
+        <table id="not-gfather-table" class="table">
+	  <thead>
+	    <tr>
+	      <th>Kind</th>
+	      <th>Subreddit</th>
+	      <th data-breakpoints="md">Description</th>
+	      <th data-breakpoints="sm">Details</th>
+	      <th data-breakpoints="sm">Time</th>
+	    </tr>
+	  </thead>
+	  <tbody id="not-gfather-tbody">
+	  </tbody>
+	</table>
+      </div>
     </div>
     <?php include 'footer.php'; ?>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="js/jquery.timeago.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/footable.min.js"></script>
 
     <script type="text/javascript">
+      jQuery(function($){
+      });
+
       $("#search-form").on('submit', function(e) {
 	e.preventDefault();
 	
-	hashtags = [];
+	var hashtags = [];
 	if($("scammer-checkbox").is(":checked")) {
 	  hashtags.push("#scammer");
 	}
@@ -60,7 +82,27 @@ include 'pagestart.php';
 	$("#search_for").attr('disabled', true);
 
 	$.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: 2 }, function(data, stat) {
-	  console.log(data);
+	  if(!data.grandfathered) {
+	    var table = $("#not-gfather-table");
+	    var tbody = $("#not-gfather-tbody");
+	    tbody.empty();
+
+	    var new_html = "";
+	    for(var i = 0; i < data.history.length; i++) {
+	      var ele = data.history[i];
+	      new_html += "<tr>";
+	      new_html += "<td>" + ele.kind + "</td>";
+	      new_html += "<td>" + ele.subreddit + "</td>";
+	      new_html += "<td>" + ele.description + "</td>";
+	      new_html += "<td>" + ele.details + "</td>";
+	      new_html += "<td>" + $.timeago(new Date(data.time * 1000)) + "</td>";
+	      new_html += "</tr>";
+	    }
+	    tbody.html(new_html);
+
+            table.footable();
+	  }
+	  $("#search_for").removeAttr('disabled');
 	}).fail(function(xhr) {
 	  console.log(xhr.responseJSON);
 
