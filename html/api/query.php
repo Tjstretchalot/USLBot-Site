@@ -42,7 +42,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   if(isset($_GET['hashtags'])) {
     $_hashtags = $_GET['hashtags'];
 
-    $_expl_hashtags = explode($_hashtags, ',', 6);
+    $_expl_hashtags = explode(',', $_hashtags, 6);
 
     if(count($_expl_hashtags) <= 5) {
       $hashtags = $_expl_hashtags;
