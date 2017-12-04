@@ -98,7 +98,7 @@ include 'pagestart.php';
                 new_html += "</tr>";
               }
               tbody.html(new_html);
-              table.footable();
+              table.footable({showToggle: true});
               wrapper.slideDown('fast', function() { 
                 $("#search_for").removeAttr('disabled');
               });
