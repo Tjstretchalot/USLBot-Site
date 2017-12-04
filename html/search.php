@@ -45,7 +45,40 @@ include 'pagestart.php';
     <script type="text/javascript">
       $("#search-form").on('submit', function(e) {
 	e.preventDefault();
-	console.log("search form submitted")
+	
+	hashtags = [];
+	if($("scammer-checkbox").is(":checked")) {
+	  hashtags.push("#scammer");
+	}
+	if($("#sketchy-checkbox").is(":checked")) {
+	  hashtags.push("#sketchy");
+	}
+	if($("#troll-checkbox").is(":checked")) {
+	  hashtags.push("#troll");
+	}
+
+	$("#search_for").attr('disabled', true);
+
+	$.get("/api/query.php", { query: $("#search_for").val(), hashtags.join(','), format: 2 }, function(data, stat) {
+	  console.log(data);
+	}).fail(function(xhr) {
+	  console.log(xhr.responseJSON);
+
+	  var json_resp = xhr.responseJSON;
+	  var err_type = json_resp.error_type;
+	  var err_mess = json_resp.error_message;
+	  console.log(err_type + ": " + err_mess);
+
+          statusText.fadeOut('fast', function() {
+	    statusText.removeClass("alert-success").removeClass("alert-info");
+	    statusText.addClass("alert-danger");
+	    statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
+	    $("#search_for").removeAttr('disabled');
+	    statusText.fadeIn('fast');
+	  });
+	});
+	
+	
       });
     </script>
   </body>
