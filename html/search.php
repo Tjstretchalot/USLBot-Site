@@ -62,9 +62,6 @@ include 'pagestart.php';
     <script src="js/footable.min.js"></script>
 
     <script type="text/javascript">
-      jQuery(function($){
-      });
-
       $("#search-form").on('submit', function(e) {
         e.preventDefault();
         
@@ -83,9 +80,10 @@ include 'pagestart.php';
 
         $.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: 2 }, function(data, stat) {
           if(!data.data.grandfathered) {
+	    var wrapper = $("#output-not-grandfathered");
             var table = $("#not-gfather-table");
             var tbody = $("#not-gfather-tbody");
-            tbody.slideUp('fast', function() {
+            wrapper.slideUp('fast', function() {
               tbody.empty();
 
               var new_html = "";
@@ -101,7 +99,7 @@ include 'pagestart.php';
               }
               tbody.html(new_html);
               table.footable();
-              tbody.slideDown('fast', function() { 
+              wrapper.slideDown('fast', function() { 
                 $("#search_for").removeAttr('disabled');
               });
             });
