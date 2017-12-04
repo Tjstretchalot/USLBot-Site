@@ -5,6 +5,7 @@ require_once 'database/register_account_requests.php';
 
 if($_SERVER['REQUEST_METHOD'] === 'GET') {
   /* CONSTANTS */
+  $err_prefix = 'query.php';
 
   // The hashtags that non-moderators are allowed to search for
   $NON_MODERATOR_HASHTAGS = array( '#sketchy', '#scammer', '#troll' );
@@ -165,7 +166,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $ban_history = array();
 
   while(($row = $res->fetch_assoc()) != null) {
-    $ban_history[] = array( 'bh' => $row );
+    $ban_history[] = new ArrayObject(array( 'bh' => $row ));
   }
 
   $res->close();
@@ -183,6 +184,25 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       $conn->close();
       return;
     }
+  }
+
+  // Fetching the corresponding handled_mod_action for the ban histories
+  foreach($ban_history as $bh) {
+    $sql = 'SELECT * FROM handled_modactions WHERE id=?';
+    check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
+    check_db_error($conn, $err_prefix, $stmt->bind_param('i', $bh['bh']['handled_modaction_id']));
+    check_db_error($conn, $err_prefix, $stmt->execute());
+    check_db_error($conn, $err_prefix, $res = $stmt->get_result());
+    $row = $res->fetch_assoc();
+    if($row === null) {
+      $res->close();
+      $stmt->close();
+      echo_fail(500, 'SERVER ERROR', 'A mysql database conflict was detected (foreign key)');
+      return;
+    }
+    $bh['hma'] = $row;
+    $res->close();
+    $stmt->close();
   }
 
   // Cleansing the ban_history of any bans that don't meet the search
@@ -220,26 +240,6 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     $ban_history = $valid_bhs;
-  }
-
-  // Fetching the corresponding handled_mod_action for the remaining 
-  // ban histories
-  foreach($ban_history as $bh) {
-    $sql = 'SELECT * FROM handled_modactions WHERE id=?';
-    check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
-    check_db_error($conn, $err_prefix, $stmt->bind_param('i', $bh['bh']['handled_modaction_id']));
-    check_db_error($conn, $err_prefix, $stmt->execute());
-    check_db_error($conn, $err_prefix, $res = $stmt->get_result());
-    $row = $res->fetch_assoc();
-    if($row === null) {
-      $res->close();
-      $stmt->close();
-      echo_fail(500, 'SERVER ERROR', 'A mysql database conflict was detected (foreign key)');
-      return;
-    }
-    $bh['hma'] = $row;
-    $res->close();
-    $stmt->close();
   }
 
   // Assigned the changed_bhs to either invalid or valid bhs
@@ -292,7 +292,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $unban_history = array();
 
   while(($row = $res->fetch_assoc()) != null) {
-    $unban_history[] = array( 'ubh' => $row );
+    $unban_history[] = new ArrayObject(array( 'ubh' => $row ));
   }
 
   $res->close();
