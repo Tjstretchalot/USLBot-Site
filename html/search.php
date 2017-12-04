@@ -82,14 +82,14 @@ include 'pagestart.php';
 	$("#search_for").attr('disabled', true);
 
 	$.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: 2 }, function(data, stat) {
-	  if(!data.grandfathered) {
+	  if(!data.data.grandfathered) {
 	    var table = $("#not-gfather-table");
 	    var tbody = $("#not-gfather-tbody");
 	    tbody.empty();
 
 	    var new_html = "";
-	    for(var i = 0; i < data.history.length; i++) {
-	      var ele = data.history[i];
+	    for(var i = 0; i < data.data.history.length; i++) {
+	      var ele = data.data.history[i];
 	      new_html += "<tr>";
 	      new_html += "<td>" + ele.kind + "</td>";
 	      new_html += "<td>" + ele.subreddit + "</td>";
