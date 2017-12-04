@@ -39,6 +39,7 @@ include 'pagestart.php';
         <input type="submit" class="sr-only" />
       </form>
       <hr />
+      <h3 id="person-name"></h3>
       <div id="output-not-grandfathered">
         <table id="not-gfather-table" class="table">
           <thead>
@@ -53,6 +54,9 @@ include 'pagestart.php';
           <tbody id="not-gfather-tbody">
           </tbody>
         </table>
+      </div>
+      <div id="output-grandfathered" style="display: none;">
+        <p>This person is on the grandfathered list. He was banned with the description <span id="gfather-banned-desc"></span> and hasn't been unbanned since.</p>
       </div>
     </div>
     <?php include 'footer.php'; ?>
@@ -84,7 +88,12 @@ include 'pagestart.php';
         $("#search_for").attr('disabled', true);
 
         $.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: 2 }, function(data, stat) {
+	  $("#person-name").fadeOut('fast', function() {
+	    $("#person-name").html(data.data.person);
+	    $("#person-name").fadeIn('fast');
+	  });
           if(!data.data.grandfathered) {
+	    $("#output-grandfathered").slideUp('fast');
 	    var wrapper = $("#output-not-grandfathered");
             var table = $("#not-gfather-table");
             var tbody = $("#not-gfather-tbody");
@@ -108,7 +117,14 @@ include 'pagestart.php';
                 $("#search_for").removeAttr('disabled');
               });
             });
-          }
+          }else {
+	    $("#output-not-grandfathered").slideUp('fast');
+
+	    $("#output-grandfathered").slideUp('fast', function() {
+	      $("#gfather-banned-desc").html(data.data.description);
+	      $("#output-grandfathered").slideDown('fast');
+	    });
+	  }
         }).fail(function(xhr) {
           console.log(xhr.responseJSON);
 
