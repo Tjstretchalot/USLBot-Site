@@ -76,7 +76,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   /* VALIDATING AUTHORIZATION */
 
-  $required_auth = 0;
+  $required_auth = -1;
 
   foreach($hashtags as $tag) {
     if(!in_array($tag, $NON_MODERATOR_HASHTAGS)) {
@@ -85,13 +85,13 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 
   include_once('pagestart.php');
-  if($required_auth > 0 && $logged_in_person === null) {
+  if($required_auth > -1 && $logged_in_person === null) {
     echo_fail(403, 'UNAUTHORIZED', 'Authentication is required for the specified arguments, but none were given');
     $conn->close();
     return;
   }
 
-  if($required_auth > 0 && $logged_in_person->auth_level < $required_auth) {
+  if($required_auth > -1 && $logged_in_person->auth_level < $required_auth) {
     echo_fail(403, 'INSUFFICIENT PERMISSIONS', 'You provided authentication, but your account has insufficient permission to perform the specified command');
     $conn->close();
     return;
@@ -130,7 +130,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $meets_reqs = $is_searching_all;
     if(!$meets_reqs) {
       foreach($hashtags as $tag) {
-        if(strpos($desc, $tag) !== false) {
+        if(strpos($row['description'], $tag) !== false) {
 	  $meets_reqs = true;
 	  break;
 	}
