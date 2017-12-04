@@ -45,9 +45,9 @@ include 'pagestart.php';
             <tr>
               <th>Kind</th>
               <th>Subreddit</th>
-              <th data-breakpoints="md">Description</th>
-              <th data-breakpoints="sm">Details</th>
-              <th data-breakpoints="sm">Time</th>
+              <th data-breakpoints="lg">Description</th>
+              <th data-breakpoints="md">Details</th>
+              <th data-breakpoints="md">Time</th>
             </tr>
           </thead>
           <tbody id="not-gfather-tbody">
