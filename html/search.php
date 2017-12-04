@@ -87,9 +87,9 @@ include 'pagestart.php';
         }
 
         $("#search_for").attr('disabled', true);
-
+	statusText = $("#statusText");
         $.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: 2 }, function(data, stat) {
-	  $("#status-text").slideUp('fast');
+	  statusText.slideUp('fast');
 	  $("#person-name").fadeOut('fast', function() {
 	    $("#person-name").html(data.data.person);
 	    $("#person-name").fadeIn('fast');
