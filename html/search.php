@@ -69,7 +69,7 @@ include 'pagestart.php';
 	e.preventDefault();
 	
 	var hashtags = [];
-	if($("scammer-checkbox").is(":checked")) {
+	if($("#scammer-checkbox").is(":checked")) {
 	  hashtags.push("#scammer");
 	}
 	if($("#sketchy-checkbox").is(":checked")) {
