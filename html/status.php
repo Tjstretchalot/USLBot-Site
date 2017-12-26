@@ -31,7 +31,7 @@ $stmt->close();
       <div class="container mt-5">
         <div class="container-fluid alert" id="statusText" style="display: none"></div>
 	<h1>Modqueue Progress by Subreddit</h1>
-	<p>If these are older than 1-2 hours then the bot is likely experiencing issues</p>
+	<p>If these are older than 1-2 hours then the bot is likely experiencing issues. The times are in US-East coast / New York time.</p>
 
 	<ul>
 	  <?php foreach($subs as $sub): ?>
