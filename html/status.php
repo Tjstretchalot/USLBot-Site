@@ -13,7 +13,7 @@ while(($row = $res->fetch_assoc()) != null) {
   $subs[] = $row;
 }
 
-$rse->close();
+$res->close();
 $stmt->close();
 ?>
 <!doctype html>
