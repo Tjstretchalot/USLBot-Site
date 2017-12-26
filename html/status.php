@@ -3,8 +3,8 @@ include 'pagestart.php';
 
 
 $err_prefix = "status.php";
-check_db_error($conn, $err_prefix, $stmt = $sql_conn->prepare("SELECT monsub.subreddit AS sub, smp.updated_at AS upd_at, smp.last_time_had_full_history as full_hist_at FROM monitored_subreddits monsub INNER JOIN subreddit_modqueue_progress smp ON monsub.id = smp.monitored_subreddit_id"));
-//check_db_error($sql_conn, $err_prefix, $stmt->bind_param("i", $id));
+check_db_error($conn, $err_prefix, $stmt = $conn->prepare("SELECT monsub.subreddit AS sub, smp.updated_at AS upd_at, smp.last_time_had_full_history as full_hist_at FROM monitored_subreddits monsub INNER JOIN subreddit_modqueue_progress smp ON monsub.id = smp.monitored_subreddit_id"));
+//check_db_error($conn, $err_prefix, $stmt->bind_param("i", $id));
 check_db_error($conn, $err_prefix, $stmt->execute());
 check_db_error($conn, $err_prefix, $res = $stmt->get_result());
 
