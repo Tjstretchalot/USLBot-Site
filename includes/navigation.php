@@ -7,6 +7,10 @@ $pages = array(
   array(
     'link' => "/search.php",
     'name' => "Search"
+  ),
+  array(
+    'link' => '/status.php',
+    'name' => 'Status'
   )
 );
 
