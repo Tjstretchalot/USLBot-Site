@@ -56,6 +56,8 @@ $stmt->close();
       });
 
       var latest_action_id = 1;
+      var person_regex = /\{link person (\d+)\}/
+      var subreddit_regex = /\{link person (\d+)\}/
 
       function fetch_actions(after, succ_callback, fail_callback) {
 	after = after || 1;
@@ -76,10 +78,34 @@ $stmt->close();
 	return action.action === '{SIGSTART}';
       }
 
+      function escapeRegExp(str) {
+	return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+      }
+
       function clean_action(action, persons, subreddits) {
 	var time = new Date(action.created_at * 1000);
 	var time_str = $.timeago(time);
-	return "<b class=\"w-25\">" + time_str + "</b> " + action.action;
+
+        var cleaned = action.action
+	var match = person_regex.exec(cleaned);
+	while(match !== null) {
+	  var id = match[1];
+	  var actual_person = persons[id];
+	  var replacement = "<a href=\"#\" data-toggle=\"tooltip\" title=\"Person ID=" + id + "\">" + actual_person.username + "</a>";
+	  cleaned = cleaned.replace(escapeRegExp(match[0]), replacement);
+	  match = person_regex.exec(cleaned);
+	}
+
+	match = subreddit_regex.exec(cleaned);
+	while(match.length !== null) {
+	  var id = match[1];
+	  var actual_subreddit = subreddits[id];
+	  var replacement = "<a href=\"#\" data-toggle=\"tooltip\" title=\"Subreddit ID=" + id + "\">" + actual_subreddit.subreddit + "</a>";
+	  cleaned = cleaned.replace(escapeRegExp(match[0]), replacement);
+	  match = subreddit_regex.exec(cleaned);
+	}
+
+	return "<b class=\"w-25\">" + time_str + "</b> " + cleaned;
       }
 
       function append_cleaned_action(cleaned_action) {
@@ -103,6 +129,7 @@ $stmt->close();
 		append_cleaned_action(cleaned);
 	      }
 	    }
+	    $('[data-toggle="tooltip"]').tooltip();
 	  }, function(xhr) {
 	    clearInterval(me);
 	  });
