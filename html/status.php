@@ -106,7 +106,7 @@ $stmt->close();
 	  }, function(xhr) {
 	    clearInterval(me);
 	  });
-	}, 1000);
+	}, 5000);
       });
     </script>
   </body>
