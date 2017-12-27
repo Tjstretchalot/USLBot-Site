@@ -77,7 +77,7 @@ $stmt->close();
       }
 
       function clean_action(action, persons, subreddits) {
-	var time = new Date(action.created_at);
+	var time = new Date(action.created_at * 1000);
 	var time_str = $.timeago(time);
 	return "<b class=\"w-25\">" + time_str + "</b> " + action.action;
       }
