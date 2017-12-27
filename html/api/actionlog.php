@@ -35,7 +35,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $subreddit_ids_to_add = array();
 
   while(($row = $res->fetch_assoc()) != null) {
-    $actions[] = $row;
+    $actions[] = array(
+      'id' => $row['id'],
+      'action' => $row['action'],
+      'created_at' => strtotime($row['created_at'])
+    );
 
     $matches = array();
     $preg_result = preg_match( '{\{link person (\d+)\}}', $row->action, $matches );
