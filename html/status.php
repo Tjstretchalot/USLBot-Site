@@ -122,6 +122,7 @@ $stmt->close();
 	    var actions = data.actions;
 	    for(var i = 0, len = actions.length; i < len; i++) {
 	      var act = actions[i];
+	      latest_action_id = Math.max(latest_action_id, act.id);
 	      if(is_sigstart(act)) {
 		empty_local_list();
 	      }else {
