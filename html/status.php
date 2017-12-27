@@ -117,7 +117,7 @@ $stmt->close();
 
       $(function() {
 	var me = null;
-	me = setInterval(function() {
+	setTimeout(me = function() {
 	  fetch_actions(latest_action_id, function(data, stat) {
 	    var actions = data.actions;
 	    for(var i = 0, len = actions.length; i < len; i++) {
@@ -131,10 +131,10 @@ $stmt->close();
 	      }
 	    }
 	    $('[data-toggle="tooltip"]').tooltip();
+	    setTimeout(me, 60000);
 	  }, function(xhr) {
-	    clearInterval(me);
 	  });
-	}, 60000);
+	}, 10);
       });
     </script>
   </body>
