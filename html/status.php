@@ -91,7 +91,7 @@ $stmt->close();
 	while(match !== null) {
 	  var id = match[1];
 	  var actual_person = persons[id];
-	  var replacement = "<a href=\"#\" data-toggle=\"tooltip\" title=\"Person ID=" + id + "\">" + actual_person.username + "</a>";
+	  var replacement = "<a href=\"#\" data-toggle=\"tooltip\" title=\"Person ID=" + id + "\" onclick=\"return false\">" + actual_person.username + "</a>";
 	  cleaned = cleaned.replace(match[0], replacement);
 	  match = person_regex.exec(cleaned);
 	}
@@ -100,7 +100,7 @@ $stmt->close();
 	while(match !== null) {
 	  var id = match[1];
 	  var actual_subreddit = subreddits[id];
-	  var replacement = "<a href=\"#\" data-toggle=\"tooltip\" title=\"Subreddit ID=" + id + "\">" + actual_subreddit.subreddit + "</a>";
+	  var replacement = "<a href=\"#\" data-toggle=\"tooltip\" title=\"Subreddit ID=" + id + "\" onclick=\"return false\">" + actual_subreddit.subreddit + "</a>";
 	  cleaned = cleaned.replace(match[0], replacement);
 	  match = subreddit_regex.exec(cleaned);
 	}
