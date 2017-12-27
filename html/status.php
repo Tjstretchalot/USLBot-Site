@@ -134,7 +134,7 @@ $stmt->close();
 	  }, function(xhr) {
 	    clearInterval(me);
 	  });
-	}, 5000);
+	}, 60000);
       });
     </script>
   </body>
