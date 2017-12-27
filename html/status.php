@@ -54,10 +54,10 @@ $stmt->close();
 	  $('[data-toggle="tooltip"]').tooltip();
       });
 
-      var latest_action_id = -1;
+      var latest_action_id = 1;
 
       function fetch_actions(after, succ_callback, fail_callback) {
-	after = after || 0;
+	after = after || 1;
 	$.get('https://universalscammerlist.com/api/actionlog.php', { after: after }, function(data, stat) {
 	  succ_callback(data, stat);
 	}).fail(function(xhr) {
