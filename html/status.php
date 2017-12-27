@@ -97,7 +97,7 @@ $stmt->close();
 	}
 
 	match = subreddit_regex.exec(cleaned);
-	while(match.length !== null) {
+	while(match !== null) {
 	  var id = match[1];
 	  var actual_subreddit = subreddits[id];
 	  var replacement = "<a href=\"#\" data-toggle=\"tooltip\" title=\"Subreddit ID=" + id + "\">" + actual_subreddit.subreddit + "</a>";
