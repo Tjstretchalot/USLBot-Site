@@ -42,7 +42,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     );
 
     $matches = array();
-    $preg_result = preg_match( '{\{link person (\d+)\}}', $row->action, $matches );
+    $preg_result = preg_match( '{\{link person (\d+)\}}', $row['action'], $matches );
     if($preg_result === False) {
       error_log('Regex for person failed with error ' . preg_last_error());
       echo_fail(500, 'SERVER_ERROR', 'An internal server error occurred.');
@@ -57,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     $matches = array();
-    $preg_result = preg_match( '{\{link subreddit (\d+)\}}', $row->action, $matches );
+    $preg_result = preg_match( '{\{link subreddit (\d+)\}}', $row['action'], $matches );
     if($preg_result === False) {
       error_log('Regex for subreddit failed with error ' . preg_last_error());
       echo_fail(500, 'SERVER_ERROR', 'An internal server error occurred.');
