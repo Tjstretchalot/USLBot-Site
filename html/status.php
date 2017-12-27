@@ -57,7 +57,7 @@ $stmt->close();
 
       var latest_action_id = 1;
       var person_regex = /\{link person (\d+)\}/
-      var subreddit_regex = /\{link person (\d+)\}/
+      var subreddit_regex = /\{link subreddit (\d+)\}/
 
       function fetch_actions(after, succ_callback, fail_callback) {
 	after = after || 1;
