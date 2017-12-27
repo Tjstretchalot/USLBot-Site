@@ -38,6 +38,10 @@ $stmt->close();
 	  <li><b><?= $sub['sub'] ?></b> - Last updated at <?= $sub['upd_at'] ?>, last full history at <?= $sub['full_hist_at'] ?></li>
 	  <?php endforeach; ?>
 	</ul>
+
+	<h1>Current bot actions</h1>
+	<ul id="bot-actions-ul">
+	</ul>
       </div>
     </div>
     <?php include 'footer.php'; ?>
@@ -48,6 +52,60 @@ $stmt->close();
     <script type="text/javascript">
       $(function () {
 	  $('[data-toggle="tooltip"]').tooltip();
+      });
+
+      var latest_action_id = -1;
+
+      function fetch_actions(after, succ_callback, fail_callback) {
+	after = after || null;
+	$.get('https://universalscammerlist.com/api/actionlog.php', { after: after }, function(data, stat) {
+	  succ_callback(data, stat);
+	}).fail(function(xhr) {
+	  console.log(xhr);
+	  fail_callback(xhr);
+	});
+      }
+
+      // clears the UL of actions thats being displayed
+      function empty_local_list() {
+	$("#bot-actions-ul").empty();
+      }
+
+      function is_sigstart(action) {
+	return action.action === '{SIGSTART}';
+      }
+
+      function clean_action(action, persons, subreddits) {
+	var time = new Date(action.created_at);
+	var time_str = $.timeago(time);
+	return "<b class=\"w-25\">" + time_str + "</b> " + action.action;
+      }
+
+      function append_cleaned_action(cleaned_action) {
+	var ul = $("#bot-actions-ul");
+	var tmp = $("<li>");
+	tmp.html(cleaned_action);
+	ul.append(tmp);
+      }
+
+      $(function() {
+	var me = null;
+	setInterval(me = function() {
+	  fetch_actions(latest_action_id, function(data, stat) {
+	    var actions = data.actions;
+	    for(var i = 0, len = actions.length; i < len; i++) {
+	      var act = actions[i];
+	      if(is_sigstart(act[i])) {
+		empty_local_list();
+	      }else {
+		var cleaned = clean_action(act, data.persons, data.subreddits);
+		append_cleaned_action(cleaned);
+	      }
+	    }
+	  }, function(xhr) {
+	    clearInterval(me);
+	  });
+	}, 1000);
       });
     </script>
   </body>
