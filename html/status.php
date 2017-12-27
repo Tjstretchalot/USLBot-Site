@@ -90,7 +90,7 @@ $stmt->close();
 
       $(function() {
 	var me = null;
-	setInterval(me = function() {
+	me = setInterval(function() {
 	  fetch_actions(latest_action_id, function(data, stat) {
 	    var actions = data.actions;
 	    for(var i = 0, len = actions.length; i < len; i++) {
