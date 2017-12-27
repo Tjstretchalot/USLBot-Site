@@ -57,7 +57,7 @@ $stmt->close();
       var latest_action_id = -1;
 
       function fetch_actions(after, succ_callback, fail_callback) {
-	after = after || null;
+	after = after || 0;
 	$.get('https://universalscammerlist.com/api/actionlog.php', { after: after }, function(data, stat) {
 	  succ_callback(data, stat);
 	}).fail(function(xhr) {
