@@ -95,7 +95,7 @@ $stmt->close();
 	    var actions = data.actions;
 	    for(var i = 0, len = actions.length; i < len; i++) {
 	      var act = actions[i];
-	      if(is_sigstart(act[i])) {
+	      if(is_sigstart(act)) {
 		empty_local_list();
 	      }else {
 		var cleaned = clean_action(act, data.persons, data.subreddits);
