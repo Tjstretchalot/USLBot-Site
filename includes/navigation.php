@@ -9,6 +9,10 @@ $pages = array(
     'name' => "Search"
   ),
   array(
+    'link' => '/usage.php',
+    'name' => 'Usage'
+  ),
+  array(
     'link' => '/status.php',
     'name' => 'Status'
   )
