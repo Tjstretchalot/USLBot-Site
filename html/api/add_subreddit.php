@@ -44,14 +44,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   if(strlen($hashtags < 3)) {
-    echo_fail(400, 'ARGUMENT_INVALID', 'Hashtags is too short (3 chars at least per tag)');
+    echo_fail(400, 'ARGUMENT_INVALID', 'Hashtags is too short (3 chars at least per tag) (got ' . $hashtags . ')');
     return;
   }
 
   $hashtags_arr = explode(' ', $hashtags, 100);
   foreach($hashtags_arr as $hashtag) {
     if(strlen($hashtag) < 3) {
-      echo_fail(400, 'ARGUMENT_INVALID', 'Hashtags contains too short hashtag (3 chars at least per tag)');
+      echo_fail(400, 'ARGUMENT_INVALID', 'Hashtags contains too short hashtag (3 chars at least per tag) (got ' . $hashtag . ')');
       return;
     }
   }
