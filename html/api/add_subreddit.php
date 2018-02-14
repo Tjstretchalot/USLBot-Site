@@ -43,7 +43,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     return;
   }
 
-  if(strlen($hashtags < 3)) {
+  if(strlen($hashtags) < 3) {
     echo_fail(400, 'ARGUMENT_INVALID', 'Hashtags is too short (3 chars at least per tag) (got ' . $hashtags . ')');
     return;
   }
