@@ -91,7 +91,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   if($since !== null) {
     check_db_error($conn, $err_prefix, $stmt->bind_param('s', date('Y-m-d H:i:s', $since / 1000)));
   }else {
-    check_db_error($conn, $err_prefix, $stmt->bind_param('s', null));
+    check_db_error($conn, $err_prefix, $stmt->bind_param('s', $since));
   }
   check_db_error($conn, $err_prefix, $stmt->execute());
   check_db_error($conn, $err_prefix, $res = $stmt->get_result());
