@@ -81,7 +81,9 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     $res->close();
     $stmt->close();
-    return $result;
+    echo_success($result);
+    $conn->close();
+    return;
   }
 
   // Now we loop through all the things
