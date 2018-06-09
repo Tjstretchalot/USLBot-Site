@@ -10,11 +10,20 @@
   New-style ban: { username: 'johndoe', ban_reason: '#scammer on /r/Gameswap', banned_at: <utc timestamp in ms> }
   Old-style ban: { username: 'johndoe', traditional: true, ban_reason: 'grandfathered' }
 
-  This is meant to be queried for other apis. It has one optional parameter, 'since', which only returns bans
+  This is meant to be queried for other apis. Its best to use the optional parameter 'since', which only returns bans
   which occurred after a specified date. You can use the since parameter to update internal databases. Because
   dates are based of reddit times, it may be a good idea to leave some wiggle room in the updates. For example,
   if you want to update your database every day, fetch the history from up to two days ago and merge it in. The
   usernames are unique.
+
+  Because the database is too large for this server to store in memory, a limit of 1000 returned rows is required.
+  In order to paginate, this would be the workflow
+
+    get bulk_query.php - just returns the traditional scammers
+    get bulk_query.php?offset=0 - returns first (large number of rows). has a return value like 
+    get bulk_query.php?offset=num_rows_from_last_time
+
+    (repeatedly increment offset until you get no response)
 
 
   When using this endpoint, PLEASE include your username in the user agent!
@@ -34,9 +43,15 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   /* DEFAULT ARGUMENTS */
   $since = null; 
 
+  $offset = null;
+
   /* PARSING ARGUMENTS */
   if(isset($_GET['since']) && is_numeric($_GET['since'])) {
     $since = intval($_GET['since']);
+  }
+
+  if(isset($_GET['offset']) && is_numeric($_GET['offset'])) {
+    $offset = intval($_GET['offset']);
   }
 
   if($since !== null && $since < 0) {
@@ -44,12 +59,17 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     return;
   }
 
+  if($offset !== null && $offset < 0) {
+    echo_fail(400, 'ARGUMENT_INVALID', 'Invalid \'offset\' argument (must be nonnegative). Specify null for the traditional scammers or 0 for the first batch of new scammers');
+    return;
+  }
+
   $result = array();
 
   require_once('pagestart.php');
   
-  // If they don't specify a since, we start off with all the traditional scammers.
-  if($since === null) {
+  // If they don't specify an offset we only return traditional scammers
+  if($offset === null) {
     $sql = 'SELECT ps.username, ts.reason FROM traditional_scammers ts INNER JOIN persons ps ON ts.person_id = ps.id'; 
     check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
     check_db_error($conn, $err_prefix, $stmt->execute());
@@ -61,6 +81,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     $res->close();
     $stmt->close();
+    return $result;
   }
 
   // Now we loop through all the things
@@ -84,6 +105,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $sql .=         '(bh.ban_description like \'%#sketchy%\' or bh.ban_description like \'%#scammer%\' or bh.ban_description like \'%#troll%\') and ';
   $sql .=         '(? is NULL or hma.occurred_at > ?) ';
   $sql .=     'group by bh.banned_person_id';
+  $sql .=     'limit ' . $offset . ', 250'; // This is safe since we only allow ints in the offset
   error_log('running sql: ' . $sql);
   // Running the sql command
   check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
