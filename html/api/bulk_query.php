@@ -45,9 +45,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 
   $result = array();
+
+  require_once('pagestart.php');
   
   // If they don't specify a since, we start off with all the traditional scammers.
-  if($since !== null) {
+  if($since === null) {
     $sql = 'SELECT ps.username, ts.reason FROM traditional_scammers ts INNER JOIN persons ps ON ts.person_id = ps.id'; 
     check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
     check_db_error($conn, $err_prefix, $stmt->execute());
