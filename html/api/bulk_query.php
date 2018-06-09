@@ -108,7 +108,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $sql .=         '(? is NULL or hma.occurred_at > ?) ';
   $sql .=     'group by bh.banned_person_id ';
   $sql .=     'limit ' . $offset . ', 250'; // This is safe since we only allow ints in the offset
-  error_log('running sql: ' . $sql);
+
   // Running the sql command
   check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
   if($since !== null) {
@@ -122,6 +122,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   // Pushing the results to memory
   while($row = $res->fetch_array()) {
+    $reason = $row[1];
+    if(substr($reason, 0, 7) === 'other: ') {
+      $reason = substr($reason, 7);
+    }
+
     $result[] = array( 'username' => $row[0], 'ban_reason' => $row[1], 'banned_at' => strtotime($row[2]) * 1000 ); 
   }
   $res->close();
