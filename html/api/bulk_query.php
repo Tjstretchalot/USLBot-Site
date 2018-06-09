@@ -127,7 +127,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       $reason = substr($reason, 7);
     }
 
-    $result[] = array( 'username' => $row[0], 'ban_reason' => $row[1], 'banned_at' => strtotime($row[2]) * 1000 ); 
+    $result[] = array( 'username' => $row[0], 'ban_reason' => $reason, 'banned_at' => strtotime($row[2]) * 1000 ); 
   }
   $res->close();
   $stmt->close();
