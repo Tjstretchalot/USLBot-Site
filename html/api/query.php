@@ -367,6 +367,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   };
 
   function fetch_subs_bh($sql_c, $bhs) {
+    global $err_prefix;
     foreach($bhs as $bh) {
       check_db_error($sql_c, $err_prefix, $stmt = $sql_c->prepare('SELECT * FROM monitored_subreddits WHERE id=?'));
       check_db_error($sql_c, $err_prefix, $stmt->bind_param('i', $bh['hma']['monitored_subreddit_id']));
@@ -380,6 +381,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   };
 
   function fetch_subs_ubh($sql_c, $ubhs) {
+    global $err_prefix;
     foreach($ubhs as $ubh) {
       $mon_sub_id = $ubh['hma']['monitored_subreddit_id'];
       check_db_error($sql_c, $err_prefix, $stmt = $sql_c->prepare('SELECT * FROM monitored_subreddits WHERE id=?'));

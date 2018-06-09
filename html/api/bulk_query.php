@@ -104,4 +104,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   echo_success($result);
   $conn->close();
   return;
+}else {
+  echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a GET request at this endpoint');
+}
 ?>
