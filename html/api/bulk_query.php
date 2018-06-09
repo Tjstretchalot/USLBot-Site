@@ -83,7 +83,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $sql .=         ') and ';
   $sql .=         '(bh.ban_description like \'%#sketchy%\' or bh.ban_description like \'%#scammer%\' or bh.ban_description like \'%#troll%\') and ';
   $sql .=         '(? is NULL or hma.occurred_at > ?) ';
-  $sql .=     'group by bh.banned_person_id ';
+  $sql .=     'group by bh.banned_person_id';
 
   // Running the sql command
   check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
