@@ -89,9 +89,10 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   // Running the sql command
   check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
   if($since !== null) {
-    check_db_error($conn, $err_prefix, $stmt->bind_param('s', date('Y-m-d H:i:s', $since / 1000)));
+    $asstr = date('Y-m-d H:i:s', $since / 1000);
+    check_db_error($conn, $err_prefix, $stmt->bind_param('ss', $asstr, $asstr));
   }else {
-    check_db_error($conn, $err_prefix, $stmt->bind_param('s', $since));
+    check_db_error($conn, $err_prefix, $stmt->bind_param('ss', $since, $since));
   }
   check_db_error($conn, $err_prefix, $stmt->execute());
   check_db_error($conn, $err_prefix, $res = $stmt->get_result());
