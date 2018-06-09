@@ -20,7 +20,7 @@
   In order to paginate, this would be the workflow
 
     get bulk_query.php - just returns the traditional scammers
-    get bulk_query.php?offset=0 - returns first (large number of rows). has a return value like 
+    get bulk_query.php?offset=0 - returns first (large number of rows). the exact number of rows may vary 
     get bulk_query.php?offset=num_rows_from_last_time
 
     (repeatedly increment offset until you get no response)
