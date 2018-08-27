@@ -102,6 +102,8 @@ include 'pagestart.php';
             wrapper.slideUp('fast', function() {
               tbody.empty();
 
+	      data.data.history.sort(function(a, b) { return b.time - a.time; });
+
               var new_html = "";
               for(var i = 0; i < data.data.history.length; i++) {
                 var ele = data.data.history[i];
