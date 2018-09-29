@@ -94,7 +94,9 @@ include 'pagestart.php';
 	  $("#simple-p").html("This user is <b>not banned</b>.");
 	}
 
-	$("#output-simple").slideDown('fast');
+	$("#output-simple").slideDown('fast', function() {
+	  $("#search_for").removeAttr('disabled');
+	});
       }
 
       function handleDataComplex(data) {
