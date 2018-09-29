@@ -37,6 +37,13 @@ include 'pagestart.php';
             </label>
           </div>
         </div>
+	<div class="form-group row">
+	  <div class="form-check col-auto">
+	    <label class="form-check-label">
+	      <input class="form-check-input" type="checkbox" id="detailed-checkbox"> Detailed <a href="#" data-toggle="tooltip" title="Get a per-subreddit history of the user">&#9432;</a>
+	    </label>
+	  </div>
+	</div>
         <input type="submit" class="sr-only" />
       </form>
       <hr />
@@ -59,6 +66,9 @@ include 'pagestart.php';
       <div id="output-grandfathered" style="display: none;">
         <p>This person is on the grandfathered list. He was banned with the description <span id="gfather-banned-desc"></span> and hasn't been unbanned since.</p>
       </div>
+      <div id="output-simple" style="display: none;">
+        <p id="simple-p"></p>
+      </div>
     </div>
     <?php include 'footer.php'; ?>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -71,7 +81,63 @@ include 'pagestart.php';
     <script type="text/javascript">
       jQuery(function($){
 	$('.table').footable();
+	$('[data-toggle="tooltip"]').tooltip();
       });
+      
+      function handleDataSimple(data) {
+	$("#output-grandfathered").slideUp('fast');
+	$("#output-not-grandfathered").slideUp('fast');
+
+	if(data.data.banned) {
+	  $("#simple-p").html("This user is <b>banned</b>");
+	}else {
+	  $("#simple-p").html("This user is <b>not banned</b>.");
+	}
+
+	$("#simple-p").slideDown('fast');
+      }
+
+      function handleDataComplex(data) {
+	$("#output-simple").slideUp('fast');
+	if(!data.data.grandfathered) {
+	  $("#output-grandfathered").slideUp('fast');
+	  var wrapper = $("#output-not-grandfathered");
+	  var table = $("#not-gfather-table");
+	  var tbody = $("#not-gfather-tbody");
+	  wrapper.slideUp('fast', function() {
+	    tbody.empty();
+
+	    data.data.history.sort(function(a, b) { return b.time - a.time; });
+
+	    var new_html = "";
+	    for(var i = 0; i < data.data.history.length; i++) {
+	      var ele = data.data.history[i];
+	      new_html += "<tr>";
+	      new_html += "<td>" + ele.kind + "</td>";
+	      new_html += "<td>" + ele.subreddit + "</td>";
+	      new_html += "<td>" + ele.description + "</td>";
+	      new_html += "<td>" + ele.details + "</td>";
+	      new_html += "<td>" + $.timeago(new Date(ele.time * 1000)) + "</td>";
+	      new_html += "</tr>";
+	    }
+	    tbody.html(new_html);
+	    table.footable();
+	    wrapper.slideDown('fast', function() { 
+	      $("#search_for").removeAttr('disabled');
+	    });
+	  });
+	}else {
+	  $("#output-not-grandfathered").slideUp('fast');
+
+	  $("#output-grandfathered").slideUp('fast', function() {
+	    $("#gfather-banned-desc").html(data.data.description);
+	    $("#output-grandfathered").slideDown('fast', function() {
+	      $("#search_for").removeAttr('disabled');
+	    });
+	  });
+	}
+      }
+
       $("#search-form").on('submit', function(e) {
         e.preventDefault();
         
@@ -86,50 +152,24 @@ include 'pagestart.php';
           hashtags.push("#troll");
         }
 
+	var format = 1;
+	if($("#detailed-checkbox").is(":checked")) {
+	  format = 2;
+	}
+
         $("#search_for").attr('disabled', true);
 	statusText = $("#statusText");
-        $.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: 2 }, function(data, stat) {
+        $.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: format }, function(data, stat) {
 	  statusText.slideUp('fast');
 	  $("#person-name").fadeOut('fast', function() {
 	    $("#person-name").html(data.data.person);
 	    $("#person-name").fadeIn('fast');
 	  });
-          if(!data.data.grandfathered) {
-	    $("#output-grandfathered").slideUp('fast');
-	    var wrapper = $("#output-not-grandfathered");
-            var table = $("#not-gfather-table");
-            var tbody = $("#not-gfather-tbody");
-            wrapper.slideUp('fast', function() {
-              tbody.empty();
 
-	      data.data.history.sort(function(a, b) { return b.time - a.time; });
-
-              var new_html = "";
-              for(var i = 0; i < data.data.history.length; i++) {
-                var ele = data.data.history[i];
-                new_html += "<tr>";
-                new_html += "<td>" + ele.kind + "</td>";
-                new_html += "<td>" + ele.subreddit + "</td>";
-                new_html += "<td>" + ele.description + "</td>";
-                new_html += "<td>" + ele.details + "</td>";
-                new_html += "<td>" + $.timeago(new Date(ele.time * 1000)) + "</td>";
-                new_html += "</tr>";
-              }
-              tbody.html(new_html);
-              table.footable();
-              wrapper.slideDown('fast', function() { 
-                $("#search_for").removeAttr('disabled');
-              });
-            });
-          }else {
-	    $("#output-not-grandfathered").slideUp('fast');
-
-	    $("#output-grandfathered").slideUp('fast', function() {
-	      $("#gfather-banned-desc").html(data.data.description);
-	      $("#output-grandfathered").slideDown('fast', function() {
-                $("#search_for").removeAttr('disabled');
-	      });
-	    });
+	  if(format === 1) {
+	    handleDataSimple(data);
+	  }else {
+	    handleDataComplex(data);
 	  }
         }).fail(function(xhr) {
           console.log(xhr.responseJSON);
