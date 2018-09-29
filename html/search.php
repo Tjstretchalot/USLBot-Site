@@ -89,9 +89,9 @@ include 'pagestart.php';
 	$("#output-not-grandfathered").slideUp('fast');
 
 	if(data.data.banned) {
-	  $("#simple-p").html("This user is <b>banned</b>");
+	  $("#simple-p").html("This user is <b style=\"font-size: larger; color: red;\">banned</b>");
 	}else {
-	  $("#simple-p").html("This user is <b>not banned</b>.");
+	  $("#simple-p").html("This user is <b style=\"color:green;\">not banned</b>.");
 	}
 
 	$("#output-simple").slideDown('fast', function() {
