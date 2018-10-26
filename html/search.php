@@ -1,5 +1,8 @@
 <?php
 include 'pagestart.php';
+include 'api/common.php'; 
+
+$all_auth = ($logged_in_person !== null && $logged_in_person->auth_level >= $MODERATOR_PERMISSION);
 ?>
 <!doctype html>
 <html lang="en">
@@ -36,6 +39,13 @@ include 'pagestart.php';
               <input class="form-check-input" type="checkbox" id="troll-checkbox" checked> #troll
             </label>
           </div>
+<?php if($all_auth): ?>
+	  <div class="form-check col-auto">
+	    <label class="form-check-label">
+	      <input class="form-check-input" type="checkbox" id="all-checkbox"> #all <span data-toggle="tooltip" title="This is for moderators only.">&#9432;</span>
+	    </label>
+	  </div>
+<?php endif; ?>
         </div>
 	<div class="form-group row">
 	  <div class="form-check col-auto">
@@ -139,6 +149,13 @@ include 'pagestart.php';
 	  });
 	}
       }
+<?php if($all_auth): ?>
+      $('#all-checkbox').change(function() {
+	$('#scammer-checkbox').attr('disabled', this.checked);
+	$('#sketchy-checkbox').attr('disabled', this.checked);
+	$('#troll-checkbox').attr('disabled', this.checked);
+      });
+<?php endif; ?>
 
       $("#search-form").on('submit', function(e) {
         e.preventDefault();
@@ -152,7 +169,10 @@ include 'pagestart.php';
         }
         if($("#troll-checkbox").is(":checked")) {
           hashtags.push("#troll");
-        }
+        }<?php if($all_auth): ?>
+	if($('#all-checkbox').is(':checked')) {
+	  hashtags = [ 'all' ];
+	}<?php endif;?>
 
 	var format = 1;
 	if($("#detailed-checkbox").is(":checked")) {
