@@ -20,10 +20,13 @@
       $auth_level = $logged_in_person->auth_level;
       
       $temp_auth_level = TemporaryAuthorizationLevelMapping::fetch_by_person_id($conn, $logged_in_person->id);
-      if($temp_auth_level->expires_at < time()) {
-	TemporaryAuthorizationLevelMapping::delete_by_id($conn, $temp_auth_level->id);
-      }elseif($temp_auth_level !== null && $temp_auth_level->auth_level > $auth_level) {
-	$auth_level = $temp_auth_level->auth_level;
+
+      if($temp_auth_level !== null) {
+	if($temp_auth_level->expires_at < time()) {
+	  TemporaryAuthorizationLevelMapping::delete_by_id($conn, $temp_auth_level->id);
+	}elseif($temp_auth_level->auth_level > $auth_level) {
+	  $auth_level = $temp_auth_level->auth_level;
+	}
       }
     }
   }
