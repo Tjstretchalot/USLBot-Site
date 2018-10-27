@@ -91,7 +91,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     return;
   }
 
-  if($required_auth > -1 && $logged_in_person->auth_level < $required_auth) {
+  if($required_auth > -1 && $auth_level < $required_auth) {
     echo_fail(403, 'INSUFFICIENT PERMISSIONS', 'You provided authentication, but your account has insufficient permission to perform the specified command');
     $conn->close();
     return;

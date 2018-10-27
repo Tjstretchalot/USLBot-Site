@@ -2,7 +2,7 @@
 include 'pagestart.php';
 include 'api/common.php'; 
 
-$all_auth = ($logged_in_person !== null && $logged_in_person->auth_level >= $MODERATOR_PERMISSION);
+$all_auth = ($auth_level >= $MODERATOR_PERMISSION);
 ?>
 <!doctype html>
 <html lang="en">

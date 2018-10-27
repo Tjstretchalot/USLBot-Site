@@ -1,4 +1,6 @@
 <?php
+include_once 'api/common.php';
+
 $pages = array(
   array(
     'link' => "/index.php",
@@ -24,6 +26,13 @@ if($logged_in_person === null) {
     'name' => "Login"
   );
 }else {
+  if($auth_level < $MODERATOR_PERMISSION) {
+    $pages[] = array(
+      'link' => '/request_auth.php',
+      'name' => 'Request Auth'
+    );
+  }
+
   $pages[] = array(
     'link' => '/logout.php',
     'name' => 'Logout'
