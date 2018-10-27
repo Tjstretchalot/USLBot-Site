@@ -44,7 +44,7 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
 	$('[data-toggle="tooltip"]').tooltip();
       });
       
-      $("#request-auth-form").on('submit', function(e) {
+      $("#request_auth_form").on('submit', function(e) {
         e.preventDefault();
 
 	$("#req_auth_btn").attr('disabled', true);
