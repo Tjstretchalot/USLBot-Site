@@ -35,7 +35,7 @@
 
     public static function create($sql_conn, $person_id) {
       $err_prefix = "TemporaryAuthorizationRequestMapping#create";
-      check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("INSERT INTO "));
+      check_db_error($sql_conn, $err_prefix, $stmt = $sql_conn->prepare("INSERT INTO temporary_auth_requests (person_id) VALUES (?)"));
       check_db_error($sql_conn, $err_prefix, $stmt->bind_param("i", $person_id));
       check_db_error($sql_conn, $err_prefix, $stmt->execute());
       $stmt->close();
