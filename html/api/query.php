@@ -339,7 +339,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     foreach($unban_history as $ubh) {
-      $sub_id = $ubh['hma']->monitored_subreddit_id;
+      $sub_id = $ubh['hma']['monitored_subreddit_id'];
       if(!array_key_exists('occurred_at__php', $ubh['hma'])) {
 	$ubh['hma']['occurred_at__php'] = strtotime($ubh['hma']['occurred_at']);
       }
