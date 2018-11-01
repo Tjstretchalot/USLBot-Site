@@ -126,7 +126,6 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $res->close();
   $stmt->close();
   if($row !== null) {
-    $conn->close();
     $meets_reqs = $is_searching_all;
     if(!$meets_reqs) {
       foreach($hashtags as $tag) {
@@ -137,19 +136,12 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       } 
     }
     if($meets_reqs) {
+      $conn->close();
       if($format === 1) {
 	echo_success(array( 'person' => $person->username, 'banned' => true ));
 	return;
       }else {
 	echo_success(array( 'person' => $person->username, 'grandfathered' => true, 'description' => $row['description'], 'time' => strtotime($row['created_at']) ));
-	return;
-      }
-    }else {
-      if($format === 1) {
-	echo_success(array( 'person' => $person->username, 'banned' => false ));
-	return;
-      }else {
-	echo_success(array( 'person' => $person->username, 'grandfathered' => false, 'history' => array() ));
 	return;
       }
     }
@@ -320,22 +312,72 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   // At this point we can return for the format type 1
   if($format === 1) {
-    if(count($ban_history) > 0 && count($unban_history) === 0) {
+    if(count($ban_history) > 0 && count($unban_history) <= 0) {
       echo_success(array('person' => $person->username, 'banned' => true));
       $conn->close();
       return;
     }
 
-    $latest_ban_time = 0;
+    $relevant_subreddits = array();
+    $subreddit_to_latest_ban = array();
+    $subreddit_to_latest_unban = array();
     foreach($ban_history as $bh) {
-      $latest_ban_time = max($latest_ban_time, strtotime($bh['hma']['occurred_at']));
-    }
-    $latest_unban_time = 0;
-    foreach($unban_history as $ubh) {
-      $latest_unban_time = max($latest_unban_time, strtotime($ubh['hma']['occurred_at']));
+      $sub_id = $bh['hma']->monitored_subreddit_id;
+      if(!array_key_exists('occurred_at__php', $bh['hma'])) {
+	$bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
+      }
+      if(!array_key_exists($sub_id, $relevant_subreddits)) {
+	$relevant_subreddits[$sub_id] = true;
+      }
+
+      $newest_ban = $bh['hma']['occurred_at__php'];
+      if(array_key_exists($sub_id, $subreddit_to_latest_ban)) {
+	$newest_ban = max($newest_ban, $subreddit_to_latest_ban[$sub_id]);
+      }
+
+      $subreddit_to_latest_ban[$sub_id] = $newest_ban;
     }
 
-    echo_success(array('person' => $person->username, 'banned' => ($latest_ban_time > $latest_unban_time)));
+    foreach($unban_history as $ubh) {
+      $sub_id = $ubh['hma']->monitored_subreddit_id;
+      if(!array_key_exists('occurred_at__php', $ubh['hma'])) {
+	$ubh['hma']['occurred_at__php'] = strtotime($ubh['hma']['occurred_at']);
+      }
+      if(!array_key_exists($sub_id, $relevant_subreddits)) {
+	$relevant_subreddits[$sub_id] = true;
+      }
+
+      $newest_unban = $ubh['hma']['occurred_at__php'];
+      if(array_key_exists($sub_id, $subreddit_to_latest_unban)) {
+	$newest_unban = max($newest_unban, $subreddit_to_latest_unban);
+      }
+
+      $subreddit_to_latest_unban[$sub_id] = $newest_unban;
+    }
+
+    $total_subreddits = count($relevant_subreddits);
+    $banned_subreddits = 0;
+    foreach($relevant_subreddits as $rel_sub_id=>$dummy) {
+      if(!array_key_exists($rel_sub_id, $subreddit_to_latest_ban)) {
+	continue;
+      }
+
+      if(!array_key_exists($rel_sub_id, $subreddit_to_latest_unban)) {
+	$banned_subreddits++;
+	continue;
+      }
+
+      $ban_time = $subreddit_to_latest_ban[$rel_sub_id];
+      $unban_time = $subreddit_to_latest_unban[$rel_sub_id];
+
+      if($ban_time > $unban_time) {
+	$banned_subreddits++;
+      }
+    }
+
+    $banned_heuristic = $banned_subreddits > ($total_subreddits / 2.0);
+
+    echo_success(array('person' => $person->username, 'banned' => $banned_heuristic));
     $conn->close();
     return;
   }
