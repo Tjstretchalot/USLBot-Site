@@ -322,7 +322,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $subreddit_to_latest_ban = array();
     $subreddit_to_latest_unban = array();
     foreach($ban_history as $bh) {
-      $sub_id = $bh['hma']->monitored_subreddit_id;
+      $sub_id = $bh['hma']['monitored_subreddit_id'];
       if(!array_key_exists('occurred_at__php', $bh['hma'])) {
 	$bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
       }
