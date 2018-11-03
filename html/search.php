@@ -209,10 +209,17 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
 	      statusText.fadeIn('fast');
 	    });
 	  }else {
+	    var err_mess = '';
+	    if(xhr.status === 0) {
+	      err_mess = 'You do not appear to be connected to the internet';
+	    }else {
+	      err_mess = xhr.status + ' ' + xhr.statusText;
+	    }
+
 	    statusText.fadeOut('fast', function() {
 	      statusText.removeClass("alert-success").removeClass("alert-info");
 	      statusText.addClass("alert-danger");
-	      statusText.html("<span class=\"glyphicon glyphicon-remove\"><span> Oops! Something went wrong. Error code: " + xhr.status + " " + xhr.statusText);
+	      statusText.html("<span class=\"glyphicon glyphicon-remove\"><span> Oops! Something went wrong. Error: " + xhr.status + " " + xhr.statusText);
 	      $("#search_for").removeAttr('disabled');
 	      statusText.fadeIn('fast');
 	    });
