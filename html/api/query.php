@@ -395,7 +395,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 	$banned_subreddits++;
 	for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
 	  $tag = $missing_tags[$missing_tags_index];
-	  if(strpos($ban['ban_description'], $tag) !== false) {
+	  if(strpos($ban['bh']['ban_description'], $tag) !== false) {
 	    $banned_tags[] = $tag;
 	    array_splice($missing_tags, $missing_tags_index, 1);
 	    break;
