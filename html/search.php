@@ -194,23 +194,30 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
 	    handleDataComplex(data);
 	  }
         }).fail(function(xhr) {
-          console.log(xhr.responseJSON);
-
           var json_resp = xhr.responseJSON;
-          var err_type = json_resp.error_type;
-          var err_mess = json_resp.error_message;
-          console.log(err_type + ": " + err_mess);
+	  if(json_resp !== null && json_respond.error_type !== null) {
+            console.log(xhr.responseJSON);
+	    var err_type = json_resp.error_type;
+	    var err_mess = json_resp.error_message;
+	    console.log(err_type + ": " + err_mess);
 
-          statusText.fadeOut('fast', function() {
-            statusText.removeClass("alert-success").removeClass("alert-info");
-            statusText.addClass("alert-danger");
-            statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
-            $("#search_for").removeAttr('disabled');
-            statusText.fadeIn('fast');
-          });
+	    statusText.fadeOut('fast', function() {
+	      statusText.removeClass("alert-success").removeClass("alert-info");
+	      statusText.addClass("alert-danger");
+	      statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
+	      $("#search_for").removeAttr('disabled');
+	      statusText.fadeIn('fast');
+	    });
+	  }else {
+	    statusText.fadeOut('fast', function() {
+	      statusText.removeClass("alert-success").removeClass("alert-info");
+	      statusText.addClass("alert-danger");
+	      statusText.html("<span class=\"glyphicon glyphicon-remove\"><span> Oops! Something went wrong. Error code: " + xhr.status + " " + xhr.statusText);
+	      $("#search_for").removeAttr('disabled');
+	      statusText.fadeIn('fast');
+	    });
+	  }
         });
-        
-        
       });
     </script>
   </body>
