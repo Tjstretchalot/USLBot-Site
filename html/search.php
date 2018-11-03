@@ -99,7 +99,7 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
 	$("#output-not-grandfathered").slideUp('fast');
 
 	if(data.data.banned) {
-	  $("#simple-p").html("This user is <b style=\"font-size: larger; color: red;\">banned</b>");
+	  $("#simple-p").html("This user is <b style=\"font-size: larger; color: red;\">banned</b>. Reason: " + data.data.reason);
 	}else {
 	  $("#simple-p").html("This user is <b style=\"color:green;\">not banned</b>.");
 	}

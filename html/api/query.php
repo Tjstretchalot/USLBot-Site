@@ -14,7 +14,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   /* 
    * Format options:
-   *  1: ultra-compact: returns things like { success: true, data: { person: 'john', banned: true } }
+   *  1: ultra-compact: returns things like { success: true, data: { person: 'john', banned: true, reason: '#scammer' } }
    *  2: compact: returns things like { success: true, data: { person: 'john', grandfathered: false, history: { { kind: 'ban', subreddit: 'universalscammerlist', description: '#scammer', details: 'permanent', time: 1512412103 } } } }
    */
   $format = 1; 
@@ -332,10 +332,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
       $newest_ban = $bh['hma']['occurred_at__php'];
       if(array_key_exists($sub_id, $subreddit_to_latest_ban)) {
-	$newest_ban = max($newest_ban, $subreddit_to_latest_ban[$sub_id]);
+	if($subreddit_to_latest_ban[$sub_id]['time'] > $newest_ban)
+	  continue;
       }
 
-      $subreddit_to_latest_ban[$sub_id] = $newest_ban;
+      $subreddit_to_latest_ban[$sub_id] = array('time' => $newest_ban, 'ban' => $bh);
     }
 
     foreach($unban_history as $ubh) {
@@ -357,27 +358,64 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $total_subreddits = count($relevant_subreddits);
     $banned_subreddits = 0;
+    $banned_tags = array();
+    $missing_tags = array();
+    foreach($hashtags as $tag) {
+      if($tag !== 'all' && !in_array($tag, $missing_tags)) {
+	$missing_tags[] = $tag;
+      }
+    }
+    if($is_searching_all) {
+      foreach($NON_MODERATOR_HASHTAGS as $tag) {
+	if(!in_array($tag, $missing_tags)) {
+	  $missing_tags[] = $tag;
+	}
+      }
+    }
+
     foreach($relevant_subreddits as $rel_sub_id=>$dummy) {
       if(!array_key_exists($rel_sub_id, $subreddit_to_latest_ban)) {
 	continue;
       }
 
+      $is_new_sub = false;
       if(!array_key_exists($rel_sub_id, $subreddit_to_latest_unban)) {
-	$banned_subreddits++;
-	continue;
+        $is_new_sub = true;
+      }else {
+	$ban_time = $subreddit_to_latest_ban[$rel_sub_id]['time'];
+	$unban_time = $subreddit_to_latest_unban[$rel_sub_id];
+
+	if($ban_time > $unban_time) {
+	  $is_new_sub = true;
+	}
       }
 
-      $ban_time = $subreddit_to_latest_ban[$rel_sub_id];
-      $unban_time = $subreddit_to_latest_unban[$rel_sub_id];
-
-      if($ban_time > $unban_time) {
+      if($is_new_sub) {
+	$ban = $subreddit_to_latest_ban[$rel_sub_id]['ban'];
 	$banned_subreddits++;
+	for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
+	  $tag = $missing_tags[$missing_tags_index];
+	  if(strpos($ban['ban_description'], $tag) !== false) {
+	    $banned_tags[] = $tag;
+	    array_splice($missing_tags, $missing_tags_index, 1);
+	    break;
+	  }
+	}
       }
     }
 
     $banned_heuristic = $banned_subreddits > ($total_subreddits / 2.0);
+    $banned_tags_pretty = null;
 
-    echo_success(array('person' => $person->username, 'banned' => $banned_heuristic));
+    if($banned_heuristic) {
+      if(count($banned_tags) === 0) {
+	$banned_tags_pretty = 'no matching tags';
+      }else {
+	$banned_tags_pretty = implode(', ', $banned_tags);
+      }
+    }
+
+    echo_success(array('person' => $person->username, 'banned' => $banned_heuristic, 'reason' => $banned_tags_pretty));
     $conn->close();
     return;
   }
