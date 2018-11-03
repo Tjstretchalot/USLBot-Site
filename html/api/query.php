@@ -138,7 +138,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     if($meets_reqs) {
       $conn->close();
       if($format === 1) {
-	echo_success(array( 'person' => $person->username, 'banned' => true ));
+	echo_success(array( 'person' => $person->username, 'banned' => true, 'reason' => $row['description']));
 	return;
       }else {
 	echo_success(array( 'person' => $person->username, 'grandfathered' => true, 'description' => $row['description'], 'time' => strtotime($row['created_at']) ));
@@ -312,8 +312,35 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   // At this point we can return for the format type 1
   if($format === 1) {
+    $banned_tags = array();
+    $missing_tags = array();
+    foreach($hashtags as $tag) {
+      if($tag !== 'all' && !in_array($tag, $missing_tags)) {
+	$missing_tags[] = $tag;
+      }
+    }
+
     if(count($ban_history) > 0 && count($unban_history) <= 0) {
-      echo_success(array('person' => $person->username, 'banned' => true));
+      foreach($ban_history as $ban) {
+	$banned_subreddits++;
+	for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
+	  $tag = $missing_tags[$missing_tags_index];
+	  if(strpos($ban['bh']['ban_description'], $tag) !== false) {
+	    $banned_tags[] = $tag;
+	    array_splice($missing_tags, $missing_tags_index, 1);
+	    break;
+	  }
+	}
+      }
+
+      $banned_tags_pretty = null;
+      if(count($banned_tags) === 0) {
+	$banned_tags_pretty = 'no matching tags';
+      }else {
+	$banned_tags_pretty = implode(', ', $banned_tags);
+      }
+
+      echo_success(array('person' => $person->username, 'banned' => true, 'reason' => $banned_tags_pretty));
       $conn->close();
       return;
     }
@@ -358,13 +385,6 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $total_subreddits = count($relevant_subreddits);
     $banned_subreddits = 0;
-    $banned_tags = array();
-    $missing_tags = array();
-    foreach($hashtags as $tag) {
-      if($tag !== 'all' && !in_array($tag, $missing_tags)) {
-	$missing_tags[] = $tag;
-      }
-    }
     if($is_searching_all) {
       foreach($NON_MODERATOR_HASHTAGS as $tag) {
 	if(!in_array($tag, $missing_tags)) {
