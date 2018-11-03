@@ -195,7 +195,7 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
 	  }
         }).fail(function(xhr) {
           var json_resp = xhr.responseJSON;
-	  if(json_resp !== null && json_respond.error_type !== null) {
+	  if(json_resp !== null && json_resp.error_type !== null) {
             console.log(xhr.responseJSON);
 	    var err_type = json_resp.error_type;
 	    var err_mess = json_resp.error_message;
