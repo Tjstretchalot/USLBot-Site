@@ -21,7 +21,7 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
       <div class="container-fluid alert" id="statusText" style="display: none"></div>
       <form id="search-form">
         <div class="form-group row">
-          <input type="text" class="form-control" id="search_for" aria-label="Who to search for" placeholder="Who?">
+          <input type="text" class="form-control" id="search_for" aria-label="Who to search for" placeholder="The username, without prefix">
         </div>
         <div class="form-group row justify-content-around">
           <div class="form-check col-auto">
