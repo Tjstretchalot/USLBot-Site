@@ -330,7 +330,6 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if(count($ban_history) > 0 && count($unban_history) <= 0) {
       foreach($ban_history as $ban) {
-	$banned_subreddits++;
 	for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
 	  $tag = $missing_tags[$missing_tags_index];
 	  if(strpos($ban['bh']['ban_description'], $tag) !== false) {
