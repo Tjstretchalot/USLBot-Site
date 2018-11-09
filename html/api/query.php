@@ -327,6 +327,13 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 	$missing_tags[] = $tag;
       }
     }
+    if($is_searching_all) {
+      foreach($NON_MODERATOR_HASHTAGS as $tag) {
+	if(!in_array($tag, $missing_tags)) {
+	  $missing_tags[] = $tag;
+	}
+      }
+    }
 
     if(count($ban_history) > 0 && count($unban_history) <= 0) {
       foreach($ban_history as $ban) {
@@ -392,13 +399,6 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $total_subreddits = count($relevant_subreddits);
     $banned_subreddits = 0;
-    if($is_searching_all) {
-      foreach($NON_MODERATOR_HASHTAGS as $tag) {
-	if(!in_array($tag, $missing_tags)) {
-	  $missing_tags[] = $tag;
-	}
-      }
-    }
 
     foreach($relevant_subreddits as $rel_sub_id=>$dummy) {
       if(!array_key_exists($rel_sub_id, $subreddit_to_latest_ban)) {
