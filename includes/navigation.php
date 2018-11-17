@@ -31,6 +31,11 @@ if($logged_in_person === null) {
       'link' => '/request_auth.php',
       'name' => 'Request Auth'
     );
+  }else {
+    $pages[] = array(
+      'link' => '/logs.php',
+      'name' => 'Logs'
+    );
   }
 
   $pages[] = array(
