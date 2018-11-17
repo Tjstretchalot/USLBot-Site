@@ -54,9 +54,13 @@ include 'api/common.php';
         </ul>
       </section>
     </div>
-    <?php include('bootstrap_js.php') ?>
+    <?php include 'footer.php'; ?>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="js/jquery.timeago.js"></script>
     <script src="js/moment.js"></script>
-    <script src="js/status_text_utils.js"></script>
+    <script src="js/footable.min.js"></script>
     <script type="text/javascript">
       var latest_raw = null;
       var latest_parsed = null;
