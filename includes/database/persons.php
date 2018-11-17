@@ -81,7 +81,7 @@
       $res = PersonMapping::fetch_by_username($sql_conn, $username);
       if($res)
 	return $res;
-
+      error_log('forced to fuzzy match with username ' . $username);
       return PersonMapping::fetch_like_username($sql_conn, $username);
     }
 
