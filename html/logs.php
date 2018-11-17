@@ -60,6 +60,7 @@ include 'api/common.php';
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
     <script src="js/jquery.timeago.js"></script>
     <script src="js/moment.js"></script>
+    <script src="js/moment-timezone.js"></script>
     <script src="js/footable.min.js"></script>
     <script src="js/status_text_utils.js"></script>
     <script type="text/javascript">
