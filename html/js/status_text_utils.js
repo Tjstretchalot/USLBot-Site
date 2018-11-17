@@ -1,6 +1,6 @@
-var SUCCESS_GLYPHICON = '<i class=\"far fa-check\"></i>';
-var FAILURE_GLYPHICON = '<i class=\"far fa-exclamation-triangle\"></i>';
-var LOADING_GLYPHICON = '<i class=\"far fa-sync fa-spin\"></i>';
+var SUCCESS_GLYPHICON = ''//'<i class=\"far fa-check\"></i>';
+var FAILURE_GLYPHICON = ''//'<i class=\"far fa-exclamation-triangle\"></i>';
+var LOADING_GLYPHICON = ''//'<i class=\"far fa-sync fa-spin\"></i>';
 
 /*
  * This is used to differentiate which handler is handling
