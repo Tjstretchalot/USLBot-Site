@@ -369,5 +369,5 @@ include 'api/common.php';
   </body>
 </html>
 <?php
-  $sql_conn->close();
+  $conn->close();
 ?>
