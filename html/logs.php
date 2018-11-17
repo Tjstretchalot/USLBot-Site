@@ -2,7 +2,7 @@
 include 'pagestart.php';
 include 'api/common.php'; 
 
-  if($auth_level < $MODERATOR_PERMISSION)
+  if($auth_level < $MODERATOR_PERMISSION) {
     http_response_code(401);
     echo '<html><head><title>Not Authorized</title></head><body><p>You are not authorized to view this page. <a href="/index.php">Go Back</a></p></body></html>';
     $conn->close();
