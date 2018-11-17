@@ -160,7 +160,7 @@ include 'api/common.php';
         if(line.length < 24)
           return parse_continue_line(line, last_line); // malformed
         var timestamp_str = line.slice(0, 23);
-        var timestamp = moment(timestamp_str + " +00:00", "YYYY-MMM-DD hh:mm:ss A ZZ").toDate();
+        var timestamp = moment.tz(timestamp_str, "YYYY-MMM-DD hh:mm:ss A", "America/New_York").toDate();
         if(isNaN(timestamp.getTime()))
           return parse_continue_line(line, last_line); // malformed
 
