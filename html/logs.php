@@ -61,6 +61,7 @@ include 'api/common.php';
     <script src="js/jquery.timeago.js"></script>
     <script src="js/moment.js"></script>
     <script src="js/footable.min.js"></script>
+    <script src="js/status_text_utils.js"></script>
     <script type="text/javascript">
       var latest_raw = null;
       var latest_parsed = null;
