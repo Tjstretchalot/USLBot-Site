@@ -77,6 +77,14 @@
       return $person;
     }
 
+    public static function fetch_strict_then_like_username($sql_conn, $username) {
+      $res = PersonMapping::fetch_by_username($sql_conn, $username);
+      if($res)
+	return $res;
+
+      return PersonMapping::fetch_like_username($sql_conn, $username);
+    }
+
     public static function update_row($sql_conn, $person) {
       $err_prefix = "PersonMapping#update_row";
 

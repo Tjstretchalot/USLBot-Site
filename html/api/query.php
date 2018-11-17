@@ -108,7 +108,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   /* PERFORMING REQUEST */
 
   // Fetching the person
-  $person = PersonMapping::fetch_like_username($conn, $query);
+  $person = PersonMapping::fetch_strict_then_like_username($conn, $query);
 
   if($person === null) {
     if($format === 1) {
