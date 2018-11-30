@@ -33,7 +33,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     return;
   }
 
-  $row = DatabaseHelper::fetch_one($conn, 'SELECT id,subreddit,fulfilled_at,success FROM accept_mod_inv_requests WHERE mod_person_id=? AND id=? LIMIT 1', array(
+  $row = DatabaseHelper::fetch_one($conn, 'SELECT id,subreddit,fulfilled_at,CAST(success AS unsigned integer) as success FROM accept_mod_inv_requests WHERE mod_person_id=? AND id=? LIMIT 1', array(
     array('i', $logged_in_person->id),
     array('i', $id),
   ));
@@ -43,6 +43,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->close();
     return;
   }
+  $success = $row->success === 1
 
   $conn->close();
   if($row->fulfilled_at === null) {
@@ -50,7 +51,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     return;
   }
 
-  echo_success(array('subreddit' => $row->subreddit, 'request_id' => $row->id, 'fulfilled' => true, 'fulfilled_at' => strtotime($row->fulfilled_at), 'success' => ord($row->success)));
+  echo_success(array('subreddit' => $row->subreddit, 'request_id' => $row->id, 'fulfilled' => true, 'fulfilled_at' => strtotime($row->fulfilled_at), 'success' => $success));
   return;
 }else {
   echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a POST request at this endpoint');
