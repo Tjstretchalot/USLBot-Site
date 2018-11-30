@@ -36,6 +36,10 @@ if($logged_in_person === null) {
       'link' => '/logs.php',
       'name' => 'Logs'
     );
+    $pages[] = array(
+      'link' => '/add_subreddit.php',
+      'name' => 'Add Sub'
+    );
   }
 
   $pages[] = array(
