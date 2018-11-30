@@ -65,6 +65,28 @@ if ($auth_level < $MODERATOR_PERMISSION) {
             </label>
           </div>
 	</div>
+        <div class="form-group row justify-content-around">
+          <div class="form-check col-auto">
+            <label class="form-check-label">
+              <input class="form-check-input" type="checkbox" id="scammer-checkbox" checked> #scammer
+            </label>
+          </div>
+          <div class="form-check col-auto">
+            <label class="form-check-label">
+              <input class="form-check-input" type="checkbox" id="sketchy-checkbox" checked> #sketchy
+            </label>
+          </div>
+          <div class="form-check col-auto">
+            <label class="form-check-label">
+              <input class="form-check-input" type="checkbox" id="troll-checkbox" checked> #troll
+            </label>
+          </div>
+	  <div class="form-check col-auto">
+	    <label class="form-check-label">
+	      <input class="form-check-input" type="checkbox" id="compromised-checkbox" checked> #compromised
+	    </label>
+	  </div>
+	</div>
 	<div class="form-group row">
 	  <button id="add-sub-but" type="submit" class="col-auto btn btn-primary">Submit</button>
 	</div>
@@ -202,6 +224,20 @@ if ($auth_level < $MODERATOR_PERMISSION) {
 	var readOnly = $("#read-only-checkbox").is(":checked") ? 1 : 0;
 	var writeOnly = $("#write-only-checkbox").is(":checked") ? 1 : 0;
 
+        var hashtags = [];
+        if($("#scammer-checkbox").is(":checked")) {
+          hashtags.push("#scammer");
+        }
+        if($("#sketchy-checkbox").is(":checked")) {
+          hashtags.push("#sketchy");
+        }
+        if($("#troll-checkbox").is(":checked")) {
+          hashtags.push("#troll");
+	}
+	if($("#compromised-checkbox").is(":checked")) {
+	  hashtags.push("#compromised");
+	}
+
 	statusText.slideUp('fast', function() {
 	  statusText.removeClass("alert-danger").removeClass("alert-success");
 	  statusText.addClass("alert-info");
@@ -209,7 +245,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
 	  $("#acc-inv-but").attr("disabled", true);
 	  $("#add-sub-but").attr("disabled", true);
 	  statusText.slideDown("fast", function() {
-	    $.post('https://universalscammerlist.com/api/add_subreddit.php', { subreddit: subreddit, silent: silent, read_only: readOnly, write_only: writeOnly }, function(succ) {
+	    $.post('https://universalscammerlist.com/api/add_subreddit.php', { subreddit: subreddit, hashtags: hashtags.join(' '), silent: silent, read_only: readOnly, write_only: writeOnly }, function(succ) {
 	      console.log(succ);
 	      statusText.fadeOut('fast', function() {
 		statusText.removeClass("alert-info").removeClass("alert-danger");
