@@ -197,7 +197,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
 	e.preventDefault();
 
 	var statusText = $("#status-text-add-sub");
-	var subreddit = $("add-subreddit").val();
+	var subreddit = $("#add-subreddit").val();
 	var silent = $("#silent-checkbox").is(":checked") ? 1 : 0;
 	var readOnly = $("#read-only-checkbox").is(":checked") ? 1 : 0;
 	var writeOnly = $("#write-only-checkbox").is(":checked") ? 1 : 0;
