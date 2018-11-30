@@ -22,6 +22,18 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hashtags = $_POST['hashtags'];
   }
 
+  if(isset($_POST['silent']) && is_numeric($_POST['silent']) {
+    $silent = intval($_POST['silent']);
+  }
+
+  if(isset($_POST['read_only']) && is_numeric($_POST['read_only'])) {
+    $read_only = intval($_POST['read_only']);
+  }
+
+  if(isset($_POST['write_only']) && is_numeric($_POST['write_only'])) {
+    $write_only = intval($_POST['write_only']);
+  }
+
   /* VALIDATING ARGUMENTS */
   if($subreddit === null) {
     echo_fail(400, 'ARGUMENT_MISSING', 'Missing or invalid parameter subreddit');
@@ -35,6 +47,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if(strpos($subreddit, ' ') !== False) {
     echo_fail(400, 'ARGUMENT_INVALID', 'Subreddit contains spaces');
+    return;
+  }
+
+  if(strpos($subreddit, '/') !== False) {
+    echo_fail(400, 'ARGUMENT_INVALID', 'Subreddit contains a slash');
     return;
   }
 
@@ -54,6 +71,21 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo_fail(400, 'ARGUMENT_INVALID', 'Hashtags contains too short hashtag (3 chars at least per tag) (got ' . $hashtag . ')');
       return;
     }
+  }
+
+  if($silent !== 0 && $silent !== 1) {
+    echo_fail(400, 'ARGUMENT_INVALID', 'Invalid value for silent; got ' . strval($silent) . ' expected 0 or 1');
+    return;
+  }
+
+  if($write_only !== 0 && $write_only !== 1) {
+    echo_fail(400, 'ARGUMENT_INVALID', 'Invalid value for write_only; got ' . strval($write_only) . ' expected 0 or 1');
+    return;
+  }
+
+  if($read_only !== 0 && $read_only !== 1) {
+    echo_fail(400, 'ARGUMENT_INVALID', 'Invalid value for ready_only; got ' . strval($read_only) . ' expected 0 or 1');
+    return;
   }
 
   /* VALIDATING AUTHORIZATION */
