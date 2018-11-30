@@ -43,7 +43,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->close();
     return;
   }
-  $success = $row->success === 1
+  $success = $row->success === 1;
 
   $conn->close();
   if($row->fulfilled_at === null) {
