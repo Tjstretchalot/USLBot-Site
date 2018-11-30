@@ -163,7 +163,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
 	});
       }
 
-      $('acc-inv-form').on('submit', function(e) {
+      $('#acc-inv-form').on('submit', function(e) {
 	e.preventDefault();
 
         var statusText = $("#status-text-acc-inv");
