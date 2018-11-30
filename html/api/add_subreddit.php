@@ -22,7 +22,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hashtags = $_POST['hashtags'];
   }
 
-  if(isset($_POST['silent']) && is_numeric($_POST['silent']) {
+  if(isset($_POST['silent']) && is_numeric($_POST['silent'])) {
     $silent = intval($_POST['silent']);
   }
 
