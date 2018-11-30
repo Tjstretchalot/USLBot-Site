@@ -45,7 +45,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   $conn->close();
-  if($row->fulfilled_at !== null) {
+  if($row->fulfilled_at === null) {
     echo_success(array('subreddit' => $row->subreddit, 'request_id' => $row->id, 'fulfilled' => false));
     return;
   }
