@@ -40,6 +40,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
       </form>
 
       <h2>Add subreddit</h2>
+      <div class="container-fluid alert" id="status-text-add-sub" style="display: none"></div>
       <form id="add-sub-form">
         <div class="form-group row">
 	  <input type="text" class="form-control" id="add-subreddit" aria-label="The subreddit to add" placeholder="The subreddit to add">
@@ -188,6 +189,37 @@ if ($auth_level < $MODERATOR_PERMISSION) {
 	    });
 	  }).fail(function(x) {
 	    handleXHR(statusText, x);
+	  });
+	});
+      });
+
+      $('#add-sub-form').on('submit', function(e) {
+	e.preventDefault();
+
+	var statusText = $("#status-text-add-sub");
+	var subreddit = $("add-subreddit").val();
+	var silent = $("#silent-checkbox").is(":checked") ? 1 : 0;
+	var readOnly = $("#read-only-checkbox").is(":checked") ? 1 : 0;
+	var writeOnly = $("#write-only-checkbox").is(":checked") ? 1 : 0;
+
+	statusText.slideUp('fast', function() {
+	  statusText.removeClass("alert-danger").removeClass("alert-success");
+	  statusText.addClass("alert-info");
+	  statusText.text("Making request...");
+	  $("#acc-inv-but").attr("disabled", true);
+	  $("#add-sub-but").attr("disabled", true);
+	  statusText.slideDown("fast", function() {
+	    $.post('https://universalscammerlist.com/api/add_subreddit.php', { subreddit: subreddit, silent: silent, read_only: readOnly, write_only: writeOnly }, function(succ) {
+	      console.log(succ);
+	      statusText.fadeOut('fast', function() {
+		statusText.removeClass("alert-info").removeClass("alert-danger");
+		statusText.addClass("alert-success");
+		statusText.html("Success! The subreddit has been added.");
+		statusText.fadeIn('fast');
+	      });
+	    }).fail(function(x) {
+	      handleXHR(statusText, x);
+	    });
 	  });
 	});
       });
