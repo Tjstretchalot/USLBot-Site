@@ -11,7 +11,7 @@
   if(isset($_COOKIE['session_id'])) {
     $session = SiteSessionMapping::fetch_by_session_id($conn, $_COOKIE['session_id']);
 
-    if($session === null || $session->expires_at <= time()) {
+    if($session === null || ($session->expires_at !== NULL && $session->expires_at <= time())) {
       unset($_COOKIE['session_id']);
       setcookie('session_id', '', time() - 3600, '/');
     }else {
