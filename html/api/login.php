@@ -67,7 +67,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $session_id = bin2hex(random_bytes(32));
   $expires_at = null;
-  $cookie_expires_at = time() + (60 * 60 * 24 * 365 * 10); // 10 years
+  $cookie_expires_at = (PHP_INT_MAX - 1);
   if($duration === '30days') {
     $expires_at = time() + 60 * 60 * 24 * 30;
     $cookie_expires_at = $expires_at;
@@ -75,6 +75,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $expires_at = time() + 60 * 60 * 24;
     $cookie_expires_at = $expires_at;
   }
+
+  error_log('$cookie_expires_at = ' . $cookie_expires_at);
 
   $session = SiteSessionMapping::create_and_save($conn, $session_id, $person->id, time(), $expires_at);
   setcookie('session_id', $session_id, $cookie_expires_at, '/'); 
