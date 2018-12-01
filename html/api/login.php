@@ -67,7 +67,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $session_id = bin2hex(random_bytes(32));
   $expires_at = null;
-  $cookie_expires_at = (PHP_INT_MAX - 1);
+  $cookie_expires_at = time() + (60 * 60 * 24 * 365 * 10);
   if($duration === '30days') {
     $expires_at = time() + 60 * 60 * 24 * 30;
     $cookie_expires_at = $expires_at;
