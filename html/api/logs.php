@@ -16,13 +16,17 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
   $conn->close();
   
-  $s = file_get_contents( '/home/timothy/USLBot/logs/app.log' );
-  if(!$s) {
+  $handle = fopen( '/home/timothy/USLBot/logs/app.log', 'r' );
+  if(!$handle) {
     echo_fail(500, 'SERVER ERROR', 'Failed to locate log file');
     return;
   }
+  
+  while(!feof($handle)) {
+    echo fgets($handle, 8192);
+  }
 
-  echo $s;
+  fclose($handle);
 }else {
   echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a GET request at this endpoint');
 }
