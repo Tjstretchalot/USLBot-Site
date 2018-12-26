@@ -174,8 +174,11 @@ if($auth_level < $MODERATOR_PERMISSION) {
          var st_div = $('#view-subreddits-select-status-text');
          var card = $('#view-subreddit-result-card');
          var header = $('#view-subreddit-result-header');
+         var config_tbl = $('#view-subreddit-result-config');
          var config = $('#view-subreddit-result-config-body');
+         var alt_modmail_tbl = $('#view-subreddit-result-modmail');
          var alt_modmail = $('#view-subreddit-result-modmail-body');
+         var tags_tbl = $('#view-subreddit-result-tags');
          var tags = $('#view-subreddit-result-tags-body');
 
          var card_fadeout_prom = null;
@@ -191,6 +194,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
            card_fadeout_prom.then(function() {
              header.text(sub.subreddit);
              config.html(`<tr><td>${sub.silent === 1 ? 'Yes' : 'No'}</td><td>${sub.read_only === 1 ? 'Yes' : 'No'}</td><td>${sub.write_only === 1 ? 'Yes' : 'No'}</td></tr>`);
+             config_tbl.footable();
 
              var am_html = "<tr>";
              for(var i = 0; i < sub.alt_modmails.length; i++) {
@@ -198,6 +202,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
              }
              am_html += "</tr>";
              alt_modmail.html(am_html);
+             alt_modmail_tbl.footable();
 
              var tg_html = "<tr>";
              for(var i = 0; i < subs_tags.length; i++) {
@@ -205,6 +210,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
              }
              tg_html += "</tr>";
              tags.html(tg_html);
+             tags_tbl.footable();
 
              card.fadeIn('fast');
            });
