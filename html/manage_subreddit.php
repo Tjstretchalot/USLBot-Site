@@ -321,7 +321,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
           set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Fetching the description from server to verify..', 'success', true);
           $.get('https://universalscammerlist.com/api/hashtags.php', { hashtag: tag.tag }, function(data, stat) {
             cached_tags[ind] = data.data.hashtags[0];
-            set_status_text(st_div, SUCCESS_GLYPHICON + 'Successfully fetched from server, reloading..');
+            set_status_text(st_div, SUCCESS_GLYPHICON + 'Successfully fetched from server, reloading..', 'success', true);
             refresh_tag(ind);
           }).fail(function(xhr) {
         	  set_status_text_from_xhr(st_div, xhr);
