@@ -8,7 +8,7 @@ var LOADING_GLYPHICON = ''//'<i class=\"far fa-sync fa-spin\"></i>';
  */
 var status_text_id_counter = 1;
 
-/* 
+/*
  * the jquery wrapped div we're controlling.
  */
 var __status_text_div = null;
@@ -108,7 +108,7 @@ function __status_text_tick() {
         }, 10);
       });
     })(next.alert_type, next.text);
-    
+
 
     if(next.auto_fold) {
       active = {
@@ -141,7 +141,7 @@ function __status_text_tick() {
 * the returned promise will resolve PRIOR to
 * auto folding, however it will pass in a promise for auto folding.
 * Note the auto folding promise is much more likely to be rejected,
-* since auto folding is always suppressed by future calls to 
+* since auto folding is always suppressed by future calls to
 * set_status_text and will also always be rejected if auto_fold
 * is false
 *
@@ -186,7 +186,7 @@ function set_status_text(st_div, new_text, new_alert_type, auto_fold, min_visibl
     outer_resolve = resolve;
   });
 
-  __status_text_queue.push({ 
+  __status_text_queue.push({
    text: new_text,
    alert_type: new_alert_type,
    auto_fold: auto_fold,
@@ -199,4 +199,15 @@ function set_status_text(st_div, new_text, new_alert_type, auto_fold, min_visibl
  }
 
  return promise;
+}
+
+function set_status_text_from_xhr(st_div, xhr) {
+  console.log(xhr.responseJSON);
+
+  var json_resp = xhr.responseJSON;
+  var err_type = json_resp.error_type;
+  var err_mess = json_resp.error_message;
+  console.log(err_type + ": " + err_mess);
+
+  set_status_text(st_div, FAILURE_GLYPHICON + err_mess, 'danger', false);
 }
