@@ -283,7 +283,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
           $.post('https://universalscammerlist.com/api/markdown.php', { markdown: tag.description }, function(data, stat) {
             var html = data.data.html;
 
-            card_fadeout_promise.then(function() {
+            card_fadeout_prom.then(function() {
               header.text(tag.tag);
               desc.html(html);
               edit_desc.text(desc);
