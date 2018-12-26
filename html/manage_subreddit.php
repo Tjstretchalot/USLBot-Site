@@ -36,12 +36,50 @@ if($auth_level < $MODERATOR_PERMISSION) {
       load, so you must refresh if you suspect it changed.</p>
 
       <div class="container-fluid alert" id="view-subreddits-select-status-text" style="display: none"></div>
-      <form id="view-subreddits-select-form">
-        <div class="form-group row">
-          <select id="view-subreddits-select-select">
-          </select>
-        </div>
+      <form id="view-subreddits-select-form" class="mb-3">
+        <select id="view-subreddits-select-select">
+        </select>
       </form>
+
+      <div class="card bg-info mb-3" id="view-subreddit-result-card" style="display: none;">
+        <div class="card-header" id="view-subreddit-result-header">Subreddit</div>
+        <div class="card-body">
+          <h3>Basic Settings</h3>
+          <table id="view-subreddit-result-config">
+            <thead>
+              <th>Silent</th>
+              <th>Read-Only</th>
+              <th>Write-Only</th>
+            </thead>
+            <tbody id="view-subreddit-result-config-body">
+            </tbody>
+          </table>
+
+          <h3>Modmail Redirections</h3>
+          <p>As a reminder, if the original subreddit is in this list, then the bot sends to their
+          modmail instead of posting on the subreddit. If the list is empty, the bot sends to their
+          modmail. In all other cases, the bot just posts on the listed subreddits to notify them.
+          </p>
+
+          <table id="view-subreddit-result-modmail">
+            <thead>
+              <th>Subreddit</th>
+            </thead>
+            <tbody id="view-subreddit-result-modmail-body">
+            </tbody>
+          </table>
+
+          <h3>Subscribed Tags</h3>
+          <table id="view-subreddit-result-tags">
+            <thead>
+              <th>Tag</th>
+              <th>Since</th>
+            </thead>
+            <tbody id="view-subreddit-result-tags-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <h2>View/Edit/Add Tag Information</h2>
       <p>This section allows you to view, edit, or add to the list of tags which subreddits may
@@ -105,7 +143,10 @@ if($auth_level < $MODERATOR_PERMISSION) {
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="js/jquery.basictable.min.js"></script>
     <script src="js/status_text_utils.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/moment-timezone.js"></script>
 
     <script type="text/javascript">
       var subreddits = null;
@@ -124,11 +165,54 @@ if($auth_level < $MODERATOR_PERMISSION) {
       	});
       });
 
-      /*
-      $("form").on('submit', function(e) {
-	       e.preventDefault();
+
+      $("#view-subreddits-select-select").change(function() {
+	       if(subreddits === null) { return; }
+
+         var ind = parseInt(this.value);
+         var sub = subreddits[ind];
+
+         var st_div = $('#view-subreddits-select-status-text');
+         var card = $('#view-subreddit-result-card');
+         var header = $('#view-subreddit-result-header');
+         var config = $('#view-subreddit-result-config-body');
+         var alt_modmail = $('#view-subreddit-result-modmail-body');
+         var tags = $('#view-subreddit-result-tags-body');
+
+         var card_fadeout_prom = null;
+         if(card.is(":hidden")) {
+           card_fadeout_prom = new Promise(function(resolve, reject) { resolve(); })
+         }else {
+           card_fadeout_prom = new Promise(function(resolve, reject) { card.fadeOut('slow', function() { resolve() })});
+         }
+
+         $.get('https://universalscammerlist.com/api/subscribed_hashtags.php', { subreddit: sub.subreddit }, function(data, stat) {
+           var subs_tags = data.data.hashtags;
+
+           card_fadeout_prom.then(function() {
+             header.text(sub.subreddit);
+             config.html(`<tr><td>${sub.silent === 1 ? 'Yes' : 'No'}</td><td>${sub.read_only === 1 ? 'Yes' : 'No'}</td><td>${sub.write_only === 1 ? 'Yes' : 'No'}</td></tr>`);
+
+             var am_html = "<tr>";
+             for(var i = 0; i < sub.alt_modmails.length; i++) {
+               am_html += `<td>${sub.alt_modmails[i].subreddit}</td>`;
+             }
+             am_html += "</tr>";
+             alt_modmail.html(am_html);
+
+             var tg_html = "<tr>";
+             for(var i = 0; i < subs_tags.length; i++) {
+               tg_html += `<td>${subs_tags[i].tag}</td><td>${moment.unix(subs_tags[i].created_at / 1000).format()}</td>`;
+             }
+             tg_html += "</tr>";
+             tags.html(tg_html);
+
+             card.fadeIn('fast');
+           });
+         }).fail(function(xhr) {
+       	   set_status_text_from_xhr($("#view-subreddits-select-status-text"), xhr);
+         });
       });
-      */
     </script>
   </body>
 </html>
