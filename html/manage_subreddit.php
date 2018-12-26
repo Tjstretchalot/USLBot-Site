@@ -197,19 +197,17 @@ if($auth_level < $MODERATOR_PERMISSION) {
              config.html(`<tr><td>${sub.silent === 1 ? 'Yes' : 'No'}</td><td>${sub.read_only === 1 ? 'Yes' : 'No'}</td><td>${sub.write_only === 1 ? 'Yes' : 'No'}</td></tr>`);
              config_tbl.footable();
 
-             var am_html = "<tr>";
+             var am_html = "";
              for(var i = 0; i < sub.alt_modmails.length; i++) {
-               am_html += `<td>${sub.alt_modmails[i].subreddit}</td>`;
+               am_html += `<tr><td>${sub.alt_modmails[i].subreddit}</td></tr>`;
              }
-             am_html += "</tr>";
              alt_modmail.html(am_html);
              alt_modmail_tbl.footable();
 
-             var tg_html = "<tr>";
+             var tg_html = "";
              for(var i = 0; i < subs_tags.length; i++) {
-               tg_html += `<td>${subs_tags[i].tag}</td><td>${moment.unix(subs_tags[i].created_at / 1000).calendar()}</td>`;
+               tg_html += `<tr><td>${subs_tags[i].tag}</td><td>${moment.unix(subs_tags[i].created_at / 1000).calendar()}</td></tr>`;
              }
-             tg_html += "</tr>";
              tags.html(tg_html);
              tags_tbl.footable();
 
