@@ -265,7 +265,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       function refresh_tag(ind) {
         var st_div = $("#view-tags-select-status-text");
-        var card = $("view-tag-result-card");
+        var card = $("#view-tag-result-card");
         var header = $("#view-tag-result-header");
         var desc = $("#view-tag-result-description");
         var edit_desc = $("#tag-description-markdown");
@@ -310,7 +310,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
         var tag = cached_tags[ind];
 
         var st_div = $("#view-tags-select-status-text");
-        var card = $("view-tag-result-card");
+        var card = $("#view-tag-result-card");
         var header = $("#view-tag-result-header");
         var desc = $("#view-tag-result-description");
         var edit_desc = $("#tag-description-markdown");
