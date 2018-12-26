@@ -286,7 +286,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
             card_fadeout_prom.then(function() {
               header.text(tag.tag);
               desc.html(html);
-              edit_desc.text(tag.description);
+              edit_desc.val(tag.description);
               card.fadeIn('fast');
               resolve();
             });
