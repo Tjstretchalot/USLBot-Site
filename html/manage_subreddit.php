@@ -113,7 +113,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
       $(function () {
         $('[data-toggle="tooltip"]').tooltip();
 
-        sub_selects = $("#view-subreddits-select-select");
+        var sub_selects = $("#view-subreddits-select-select");
         $.get('https://universalscammerlist.com/api/subreddits.php', {}, function(data, stat) {
           subreddits = data.data.subreddits;
       	  for(var i = 0; i < subreddits.length; i++) {

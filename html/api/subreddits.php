@@ -43,7 +43,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 
   $full_result = array();
-  for($subreddits as $sub) {
+  foreach($subreddits as $sub) {
     $row = array(
       'subreddit' => $sub->subreddit,
       'silent' => $sub->silent,
