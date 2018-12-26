@@ -157,9 +157,12 @@ if($auth_level < $MODERATOR_PERMISSION) {
         <div class="card-body">
           <h5 class="card-title">Irreversible long-duration process</h5>
           <p class="card-text">This section begins a process which takes several hours to complete.
-          This modifies a large segment of the database and forces several backup operations to a
-          remove server at key points in the process, but outside of **manually** reverting to those
-          backups this operation is irreversible.</p>
+          This forces several backup operations to a  remote server at key points in the process,
+          but outside of **manually** reverting to those backups this operation is irreversible.
+          No data is actually lost from this operation, and   the bot will not take any additional
+          actions beyond those you've just requested, however you cannot "unrequest" this, so it
+          *will* go through that several-hour process unless manually stopped, and nobody else will
+          be able to update their subreddit until this operation completes.</p>
         </div>
       </div>
     </div>
