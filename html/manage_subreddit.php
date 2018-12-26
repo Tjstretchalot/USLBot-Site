@@ -316,12 +316,12 @@ if($auth_level < $MODERATOR_PERMISSION) {
         var edit_desc = $("#tag-description-markdown");
 
         var new_desc = edit_desc.val();
-    	  set_status_text(st_div, LOADING_GLYPHICON + 'Editting hashtag...', 'info', true);
+    	  set_status_text(st_div, LOADING_GLYPHICON + 'Editing hashtag...', 'info', true, 250);
         $.post('https://universalscammerlist.com/api/edit_hashtag.php', { hashtag: tag.tag, description: new_desc }, function(data, stat) {
-          set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Fetching the description from server to verify..', 'success', true);
+          set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Fetching the description from server to verify..', 'success', true, 250);
           $.get('https://universalscammerlist.com/api/hashtags.php', { hashtag: tag.tag }, function(data, stat) {
             cached_tags[ind] = data.data.hashtags[0];
-            set_status_text(st_div, SUCCESS_GLYPHICON + 'Successfully fetched from server, reloading..', 'success', true);
+            set_status_text(st_div, SUCCESS_GLYPHICON + 'Successfully fetched from server, reloading..', 'success', true, 1000);
             refresh_tag(ind);
           }).fail(function(xhr) {
         	  set_status_text_from_xhr(st_div, xhr);
