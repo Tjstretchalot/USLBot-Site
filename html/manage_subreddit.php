@@ -87,6 +87,31 @@ if($auth_level < $MODERATOR_PERMISSION) {
       coordinating the use of tags amongst subreddits. It is safe to use and requires minimal
       processing power.</p>
 
+      <div class="container-fluid alert" id="view-tags-select-status-text" style="display: none"></div>
+      <form id="view-tags-select-form" class="mb-3">
+        <button type="button" class="btn btn-primary" id="view-tags-fetch-btn">Fetch Tags</button>
+
+        <select id="view-tags-select-select">
+        </select>
+      </form>
+
+      <div class="card bg-light mb-3" id="view-tag-result-card" style="display: none">
+        <div class="card-header" id="view-tag-result-header">Subreddit</div>
+        <div class="card-body">
+          <p class="view-tag-result-description"></p>
+
+          <form id="view-tag-edit-form" class="mt-3 mb-3">
+            <div class="form-group row">
+        	    <textarea class="form-control" id="tag-description-markdown" rows=10 aria-label="Markdown description" placeholder="Markdown description"></textarea>
+        	  </div>
+            <div class="form-group row">
+              <button type="button" class="btn btn-primary mr-3" id="tag-edit-description-btn">Update Description</button>
+              <button type="button" class="btn btn-secondary" id="tag-preview-description-btn">Preview</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <h2>Edit Subreddit Settings</h2>
       <div class="card bg-warning mb-3">
         <div class="card-header">Retroactive Action</div>
@@ -150,6 +175,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
     <script type="text/javascript">
       var subreddits = null;
+      var cached_tags = null;
 
       $(function () {
         $('[data-toggle="tooltip"]').tooltip();
@@ -163,6 +189,8 @@ if($auth_level < $MODERATOR_PERMISSION) {
       	}).fail(function(xhr) {
       	  set_status_text_from_xhr($("#view-subreddits-select-status-text"), xhr);
       	});
+
+
       });
 
 
@@ -216,6 +244,105 @@ if($auth_level < $MODERATOR_PERMISSION) {
          }).fail(function(xhr) {
        	   set_status_text_from_xhr($("#view-subreddits-select-status-text"), xhr);
          });
+      });
+
+      $("#view-tags-fetch-btn").click(function(e) {
+        e.preventDefault();
+
+        var st_div = $("#view-tags-select-status-text");
+        var tag_selects = $("#view-tags-select-select");
+        $.get('https://universalscammerlist.com/api/hashtags.php', {}, function(data, stat) {
+          tag_selects.empty();
+
+          cached_tags = data.data.hashtags;
+          for(var i = 0; i < cached_tags.length; i++) {
+            tag_selects.append($("<option>", { value: i, text: cached_tags[i].tag }));
+          }
+        }).fail(function(xhr) {
+      	  set_status_text_from_xhr(st_div, xhr);
+      	});
+      });
+
+      function refresh_tag(ind) {
+        var st_div = $("#view-tags-select-status-text");
+        var card = $("view-tag-result-card");
+        var header = $("#view-tag-result-header");
+        var desc = $("#view-tag-result-description");
+        var edit_desc = $("#tag-description-markdown");
+
+        var tag = cached_tags[ind];
+
+        var card_fadeout_prom = null;
+        if(card.is(":hidden")) {
+          card_fadeout_prom = new Promise(function(resolve, reject) { resolve(); })
+        }else {
+          card_fadeout_prom = new Promise(function(resolve, reject) { card.fadeOut('slow', function() { resolve() })});
+        }
+
+        return new Promise(function(resolve, reject) {
+          $.post('https://universalscammerlist.com/api/markdown.php', { markdown: tag.description }, function(data, stat) {
+            var html = data.data.html;
+
+            card_fadeout_promise.then(function() {
+              header.text(tag.tag);
+              desc.html(html);
+              edit_desc.text(desc);
+              card.fadeIn('fast');
+              resolve();
+            });
+          }).fail(function(xhr) {
+            set_status_text_from_xhr(st_div, xhr);
+            reject();
+          });
+        });
+      }
+
+      $("#view-tags-select-select").change(function() {
+        if(cached_tags === null) { return; }
+        var ind = parseInt(this.value);
+        refresh_tag(ind);
+      });
+
+      $("#tag-edit-description-btn").click(function(e) {
+        e.preventDefault();
+
+        var ind = parseInt($("#view-tags-select-select").val());
+        var tag = cached_tags[ind];
+
+        var st_div = $("#view-tags-select-status-text");
+        var card = $("view-tag-result-card");
+        var header = $("#view-tag-result-header");
+        var desc = $("#view-tag-result-description");
+        var edit_desc = $("#tag-description-markdown");
+
+        var new_desc = edit_desc.val();
+    	  set_status_text(st_div, LOADING_GLYPHICON + 'Editting hashtag...', 'info', true);
+        $.post('https://universalscammerlist.com/api/edit_hashtag.php', { hashtag: tag.tag, description: new_desc }, function(data, stat) {
+          set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Fetching the description from server to verify..', 'success', true);
+          $.get('https://universalscammerlist.com/api/hashtags.php', { hashtag: tag.tag }, function(data, stat) {
+            cached_tags[ind] = data.data.hashtags[0];
+            set_status_text(st_div, SUCCESS_GLYPHICON + 'Successfully fetched from server, reloading..');
+            refresh_tag(ind);
+          }).fail(function(xhr) {
+        	  set_status_text_from_xhr(st_div, xhr);
+          });
+        }).fail(function(xhr) {
+      	  set_status_text_from_xhr(st_div, xhr);
+      	});
+      });
+
+      $("#tag-preview-description-btn").click(function(e) {
+        e.preventDefault();
+
+        var desc = $("#view-tag-result-description");
+        var edit_desc = $("#tag-description-markdown");
+
+        var new_desc = edit_desc.val();
+        $.post('https://universalscammerlist.com/api/markdown.php', { markdown: new_desc }, function(data, stat) {
+          desc.html(data.data.html);
+        }).fail(function(xhr) {
+      	  set_status_text_from_xhr(st_div, xhr);
+      	});
       });
     </script>
   </body>
