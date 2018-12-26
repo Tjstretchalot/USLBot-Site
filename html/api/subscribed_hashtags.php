@@ -32,7 +32,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 
   /* PERFORMING REQUEST */
-  $result = DatabseHelper::fetch_all($conn, join(' \n', array(
+  $result = DatabaseHelper::fetch_all($conn, join(' \n', array(
     'SELECT hashtags.tag as tag, unix_timestamp(subscribed_hashtags.created_at) * 1000 as created_at FROM subscribed_hashtags ',
     'INNER JOIN monitored_subreddits ON monitored_subreddits.id = subscribed_hashtags.monitored_subreddit_id ',
     'INNER JOIN hashtags ON hashtags.id = subscribed_hashtags.hashtag_id ',
