@@ -45,7 +45,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
         <div class="card-header" id="view-subreddit-result-header">Subreddit</div>
         <div class="card-body">
           <h3>Basic Settings</h3>
-          <table id="view-subreddit-result-config">
+          <table id="view-subreddit-result-config" class="table">
             <thead>
               <th>Silent</th>
               <th>Read-Only</th>
@@ -61,7 +61,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
           modmail. In all other cases, the bot just posts on the listed subreddits to notify them.
           </p>
 
-          <table id="view-subreddit-result-modmail">
+          <table id="view-subreddit-result-modmail" class="table">
             <thead>
               <th>Subreddit</th>
             </thead>
@@ -70,7 +70,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
           </table>
 
           <h3>Subscribed Tags</h3>
-          <table id="view-subreddit-result-tags">
+          <table id="view-subreddit-result-tags" class="table">
             <thead>
               <th>Tag</th>
               <th>Since</th>
@@ -207,7 +207,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
              var tg_html = "<tr>";
              for(var i = 0; i < subs_tags.length; i++) {
-               tg_html += `<td>${subs_tags[i].tag}</td><td>${moment.unix(subs_tags[i].created_at / 1000).format()}</td>`;
+               tg_html += `<td>${subs_tags[i].tag}</td><td>${moment.unix(subs_tags[i].created_at / 1000).calendar()}</td>`;
              }
              tg_html += "</tr>";
              tags.html(tg_html);
