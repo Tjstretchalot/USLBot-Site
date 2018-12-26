@@ -202,12 +202,23 @@ function set_status_text(st_div, new_text, new_alert_type, auto_fold, min_visibl
 }
 
 function set_status_text_from_xhr(st_div, xhr) {
-  console.log(xhr.responseJSON);
-
   var json_resp = xhr.responseJSON;
-  var err_type = json_resp.error_type;
-  var err_mess = json_resp.error_message;
-  console.log(err_type + ": " + err_mess);
+  if(json_resp !== null && json_resp !== undefined && json_resp.error_type !== null) {
+    console.log(json_resp);
 
-  set_status_text(st_div, FAILURE_GLYPHICON + err_mess, 'danger', false);
+    var err_type = json_resp.error_type;
+    var err_mess = json_resp.error_message;
+    console.log(err_type + ": " + err_mess);
+
+    set_status_text(st_div, FAILURE_GLYPHICON + err_mess, 'danger', false);
+  }else {
+    var err_mess = '';
+    if(xhr.status === 0) {
+      err_mess = 'You do not appear to be connected to the internet';
+    }else {
+      err_mess = xhr.status + ' ' + xhr.statusText;
+    }
+
+    set_status_text(st_div, FAILURE_GLYPHICON + err_mess, 'danger', false);
+  }
 }
