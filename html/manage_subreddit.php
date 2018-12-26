@@ -41,7 +41,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
         </select>
       </form>
 
-      <div class="card bg-info mb-3" id="view-subreddit-result-card" style="display: none;">
+      <div class="card bg-light mb-3" id="view-subreddit-result-card" style="display: none;">
         <div class="card-header" id="view-subreddit-result-header">Subreddit</div>
         <div class="card-body">
           <h3>Basic Settings</h3>
