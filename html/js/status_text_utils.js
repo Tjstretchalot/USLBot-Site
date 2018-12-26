@@ -210,7 +210,7 @@ function set_status_text_from_xhr(st_div, xhr) {
     var err_mess = json_resp.error_message;
     console.log(err_type + ": " + err_mess);
 
-    set_status_text(st_div, FAILURE_GLYPHICON + err_mess, 'danger', false);
+    set_status_text(st_div, FAILURE_GLYPHICON + err_mess, 'danger', true, 6000);
   }else {
     var err_mess = '';
     if(xhr.status === 0) {
@@ -219,6 +219,6 @@ function set_status_text_from_xhr(st_div, xhr) {
       err_mess = xhr.status + ' ' + xhr.statusText;
     }
 
-    set_status_text(st_div, FAILURE_GLYPHICON + err_mess, 'danger', false);
+    set_status_text(st_div, FAILURE_GLYPHICON + err_mess, 'danger', true, 6000);
   }
 }
