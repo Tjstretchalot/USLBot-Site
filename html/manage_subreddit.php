@@ -146,6 +146,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
     <script src="js/status_text_utils.js"></script>
     <script src="js/moment.js"></script>
     <script src="js/moment-timezone.js"></script>
+    <script src="js/footable.min.js"></script>
 
     <script type="text/javascript">
       var subreddits = null;
