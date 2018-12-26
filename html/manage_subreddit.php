@@ -129,5 +129,6 @@ if($auth_level < $MODERATOR_PERMISSION) {
 	       e.preventDefault();
       });
       */
+    </script>
   </body>
 </html>
