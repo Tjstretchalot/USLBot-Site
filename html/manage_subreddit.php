@@ -98,7 +98,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
       <div class="card bg-light mb-3" id="view-tag-result-card" style="display: none">
         <div class="card-header" id="view-tag-result-header">Subreddit</div>
         <div class="card-body">
-          <p class="view-tag-result-description"></p>
+          <div id="view-tag-result-description"></div>
 
           <form id="view-tag-edit-form" class="mt-3 mb-3">
             <div class="form-group row">
