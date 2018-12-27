@@ -184,6 +184,21 @@ if($auth_level < $MODERATOR_PERMISSION) {
           to re-evaluate.</p>
         </div>
       </div>
+      <p>Subscribing to tags always requires re-evaluation, since old bans which previously did not
+      effect the subreddit now do. You must "fetch tags" before you are able to use this section,
+      which is available in the view/edit/add tag information section.</p>
+
+      <div class="container-fluid alert" id="sub-to-tag-status-text" style="display: none"></div>
+      <form id="sub-to-tag-select-form" class="form-inline mb-3">
+        <div class="col-6 col-lg-3">
+          <select class="form-control" id="sub-to-tag-select-sub">
+          </select>
+        </div>
+        <div class="col-6 col-lg-3">
+          <select class="form-control" id="sub-to-tag-select-tag">
+          </select>
+        </div>
+      </form>
 
       <h2>Unsubscribe From Tags</h2>
       <div class="card bg-warning mb-3">
@@ -227,7 +242,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       function reload_subreddits() {
         return new Promise(function(resolve, reject) {
-          var sub_selects = $("#view-subreddits-select-select, #edit-sub-select-select");
+          var sub_selects = $("#view-subreddits-select-select, #edit-sub-select-select, #sub-to-tag-select-sub");
           $.get('https://universalscammerlist.com/api/subreddits.php', {}, function(data, stat) {
             subreddits = data.data.subreddits;
         	  for(var i = 0; i < subreddits.length; i++) {
@@ -309,7 +324,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
         e.preventDefault();
 
         var st_div = $("#view-tags-select-status-text");
-        var tag_selects = $("#view-tags-select-select");
+        var tag_selects = $("#view-tags-select-select, #sub-to-tag-select-tag");
         $.get('https://universalscammerlist.com/api/hashtags.php', {}, function(data, stat) {
           tag_selects.empty();
 
