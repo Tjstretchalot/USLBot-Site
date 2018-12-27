@@ -262,7 +262,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
       </div>
 
       <div class="container-fluid alert" id="re-evaluate-status-text" style="display: none"></div>
-      <form id="re-evaluate-form" class="form mb-3">
+      <form id="re-evaluate-form" class="form m-3">
         <div class="form-group row">
           <textarea class="form-control" id="re-evaluate-reason" rows=3 aria-label="Reason for re-evaluating" placeholder="Reason"></textarea>
         </div>
