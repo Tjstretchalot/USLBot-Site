@@ -19,6 +19,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <link rel="stylesheet" href="css/footable.standalone.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/jquery.flexdatalist.min.css">
   </head>
   <body>
     <?php include 'navigation.php'; ?>
@@ -123,6 +124,53 @@ if($auth_level < $MODERATOR_PERMISSION) {
           existing bans under the new changes. If you completely undo your changes, you do not need
           to re-evaluate.</p>
         </div>
+
+        <p>This allows you to configure the basic settings for a subreddit. You need to repropagate if
+        you change the write only or read only settings, but otherwise you do not.</p>
+
+        <div class="container-fluid alert" id="edit-sub-status-text" style="display: none"></div>
+        <form id="edit-sub-select-form" class="mb-3">
+          <select id="edit-sub-select-select">
+          </select>
+        </form>
+
+        <div class="card bg-light mb-3" id="edit-sub-result-card" style="display: none">
+          <div class="card-header" id="edit-sub-result-header">Subreddit</div>
+
+          <form id="edit-sub-form" class="mt-3 mb-3">
+            <div class="form-group row justify-content-around">
+              <div class="form-check col-auto">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="checkbox" id="edit-sub-silent-checkbox" checked> Silent
+                </label>
+              </div>
+              <div class="form-check col-auto">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="checkbox" id="edit-sub-write-only-checkbox"> Write-Only
+                </label>
+              </div>
+              <div class="form-check col-auto">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="checkbox" id="edit-sub-read-only-checkbox"> Read-Only
+                </label>
+              </div>
+            </div>
+            <div class="form-group row">
+              <input type="text" class="form-control flexdatalist"
+                     data-min-length="1" multiple="multiple" list="edit-sub-alt-modmails"
+                     id="edit-sub-alt-modmails-input" aria-describedby="edit-sub-alt-modmails-input-help">
+              <datalist id="edit-sub-alt-modmails">
+                <option value="uslbotnotifications">uslbotnotifications</option>
+              </datalist>
+              <small id="edit-sub-alt-modmails-input-help" class="form-text text-muted">
+                Use enter ↵ to <strong>add</strong> values.
+              </small>
+            </div>
+            <div class="form-group row">
+              <button type="button" class="btn btn-warning" data-toggle="confirmation" id="edit-sub-submit-button">Edit Subreddit</button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <h2>Subscribe To Tags</h2>
@@ -153,47 +201,51 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       <h2>Request Re-evaluate Reddit-to-Meaning</h2>
       <div class="card bg-danger text-white mb-3">
-        <div class="card-header">Long-Duration, Irreversible</div>
+        <div class="card-header">Long-Duration, Non-cancellable</div>
         <div class="card-body">
-          <h5 class="card-title">Irreversible long-duration process</h5>
-          <p class="card-text">This section begins a process which takes several hours to complete.
-          This forces several backup operations to a  remote server at key points in the process,
-          but outside of **manually** reverting to those backups this operation is irreversible.
-          No data is actually lost from this operation, and   the bot will not take any additional
-          actions beyond those you've just requested, however you cannot "unrequest" this, so it
-          *will* go through that several-hour process unless manually stopped, and nobody else will
-          be able to update their subreddit until this operation completes.</p>
+          <h5 class="card-title">Long-duration process</h5>
+          <p class="card-text">This section begins a process which takes several hours to complete,
+          which you cannot cancel once started. The bot will not be responsive during this time, and
+          no other subreddit configuration will be achievable during this time.</p>
         </div>
       </div>
     </div>
 
     <?php include 'footer.php'; ?>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/esm/popper.min.js" integrity="sha256-T0gPN+ySsI9ixTd/1ciLl2gjdLJLfECKvkQjJn98lOs=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
     <script src="js/status_text_utils.js"></script>
     <script src="js/moment.js"></script>
     <script src="js/moment-timezone.js"></script>
     <script src="js/footable.min.js"></script>
+    <script src="js/jquery.flexdatalist.min.js"></script>
+    <script src="js/bootstrap-confirmation.min.js"></script>
 
     <script type="text/javascript">
       var subreddits = null;
       var cached_tags = null;
 
+      function reload_subreddits() {
+        return new Promise(function(resolve, reject) {
+          var sub_selects = $("#view-subreddits-select-select, #edit-sub-select-select");
+          $.get('https://universalscammerlist.com/api/subreddits.php', {}, function(data, stat) {
+            subreddits = data.data.subreddits;
+        	  for(var i = 0; i < subreddits.length; i++) {
+              sub_selects.append($('<option>', { value: i, text: subreddits[i].subreddit }));
+            }
+            resolve();
+        	}).fail(function(xhr) {
+        	  set_status_text_from_xhr($("#view-subreddits-select-status-text"), xhr);
+            reject(xhr);
+        	});
+        });
+      }
+
       $(function () {
         $('[data-toggle="tooltip"]').tooltip();
 
-        var sub_selects = $("#view-subreddits-select-select");
-        $.get('https://universalscammerlist.com/api/subreddits.php', {}, function(data, stat) {
-          subreddits = data.data.subreddits;
-      	  for(var i = 0; i < subreddits.length; i++) {
-            sub_selects.append($('<option>', { value: i, text: subreddits[i].subreddit }));
-          }
-      	}).fail(function(xhr) {
-      	  set_status_text_from_xhr($("#view-subreddits-select-status-text"), xhr);
-      	});
-
-
+        reload_subreddits();
       });
 
 
@@ -343,6 +395,74 @@ if($auth_level < $MODERATOR_PERMISSION) {
         var new_desc = edit_desc.val();
         $.post('https://universalscammerlist.com/api/markdown.php', { markdown: new_desc }, function(data, stat) {
           desc.html(data.data.html);
+        }).fail(function(xhr) {
+      	  set_status_text_from_xhr(st_div, xhr);
+      	});
+      });
+
+      $("#edit-sub-select-select").change(function() {
+        if(subreddits === null) { return; }
+
+        var ind = parseInt(this.value);
+        var sub = subreddits[ind];
+
+        var st_div = $("#edit-sub-status-text");
+        var card = $("#edit-sub-result-card");
+        var header = $("#edit-sub-result-header");
+        var silent_checkbox = $("#edit-sub-silent-checkbox");
+        var read_only_checkbox = $("#edit-sub-read-only-checkbox");
+        var write_only_checkbox = $("#edit-sub-write-only-checkbox");
+        var alt_modmails_input = $("#edit-sub-alt-modmails-input");
+        var alt_modmails_datalist = $("#edit-sub-alt-modmails");
+
+        card.fadeOut('fast', function() {
+          header.text(sub.subreddit);
+          silent_checkbox.prop('checked', sub.silent === 1);
+          read_only_checkbox.prop('checked', sub.read_only === 1);
+          write_only_checkbox.prop('checked', sub.write_only === 1);
+
+          alt_modmails_input.val('');
+          alt_modmails_datalist.empty();
+          for(var i = 0; i < sub.alt_modmails.length; i++) {
+            alt_modmails_datalist.append($("<option>", {
+              value: sub.alt_modmails[i].subreddit,
+              text: sub.alt_modmails[i].subreddit
+            }));
+            alt_modmails_input.flexdatalist('add', sub.alt_modmails[i].subreddit);
+          }
+
+          card.fadeIn('fast');
+        });
+      });
+
+      $("#edit-sub-submit-button").click(function(e) {
+        e.preventDefault();
+
+        var ind = parseInt($("#edit-sub-select-select").val());
+        var sub = subreddits[ind];
+
+        var st_div = $("#edit-sub-status-text");
+        var silent_checkbox = $("#edit-sub-silent-checkbox");
+        var read_only_checkbox = $("#edit-sub-read-only-checkbox");
+        var write_only_checkbox = $("#edit-sub-write-only-checkbox");
+        var alt_modmails_input = $("#edit-sub-alt-modmails-input");
+
+        var alt_modmails = alt_modmails_input.val().split(',').join(' ')
+
+    	  set_status_text(st_div, LOADING_GLYPHICON + 'Editing subreddit...', 'info', true, 250);
+        $.post("https://universalscammerlist.com/edit_subreddit.php", {
+          subreddit: sub.subreddit,
+          silent: (silent_checkbox.is(":checked") ? 1 : 0),
+          read_only: (read_only_checkbox.is(":checked") ? 1 : 0),
+          write_only: (write_only_checkbox.is(":checked") ? 1 : 0),
+          remap_modmail: alt_modmails
+        }, function(data, stat) {
+          set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Reloading subreddits from server...', 'success', true, 250);
+          reload_subreddits().then(function() {
+            set_status_text(st_div, SUCCESS_GLYPHICON + 'Success!', 'success', true, 5000);
+          }).catch(function(e) {
+            set_status_text_from_xhr(st_div, e);
+          });
         }).fail(function(xhr) {
       	  set_status_text_from_xhr(st_div, xhr);
       	});

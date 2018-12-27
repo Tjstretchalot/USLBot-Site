@@ -1,0 +1,29 @@
+<?php
+require_once 'api/common.php';
+require_once 'database/helper.php';
+
+if($_SERVER['REQUEST_METHOD'] === 'GET') {
+  /* DEFAULT ARGUMENTS */
+  /* PARSING ARGUMENTS */
+  /* VALIDATING ARGUMENTS */
+  /* VALIDATING AUTHORIZATION */
+  include_once('pagestart.php');
+  if($logged_in_person === null) {
+    echo_fail(403, 'Authentication is required for this endpoint');
+    $conn->close();
+    return;
+  }
+
+  if($logged_in_person->auth_level < $MODERATOR_PERMISSION) {
+    echo_fail(403, 'Access denied, insufficient permission');
+    $conn->close();
+    return;
+  }
+  /* PERFORMING REQUEST */
+
+  echo_success(array());
+  $conn->close();
+}else {
+  echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a GET request at this endpoint');
+}
+?>
