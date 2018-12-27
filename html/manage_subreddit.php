@@ -155,7 +155,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
               </label>
             </div>
           </div>
-          <div class="form-group row">
+          <div class="form-group row ml-3 mr-3">
             <input type="text" class="form-control flexdatalist"
                    data-min-length="1" multiple="multiple" list="edit-sub-alt-modmails"
                    id="edit-sub-alt-modmails-input" aria-describedby="edit-sub-alt-modmails-input-help">
@@ -166,7 +166,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
               Use enter ↵ to <strong>add</strong> values.
             </small>
           </div>
-          <div class="form-group row">
+          <div class="form-group row ml-3">
             <button type="button" class="btn btn-warning" data-toggle="confirmation" id="edit-sub-submit-button">Edit Subreddit</button>
           </div>
         </form>
