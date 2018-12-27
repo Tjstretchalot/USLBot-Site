@@ -565,7 +565,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
         var st_div = $("#unsub-from-tag-status-text");
 
-    	  set_status_text(st_div, LOADING_GLYPHICON + 'Subscribing to tag...', 'info', true, 250);
+    	  set_status_text(st_div, LOADING_GLYPHICON + 'Unsubscribing from tag...', 'info', true, 250);
         $.post("https://universalscammerlist.com/api/del_subscribed_hashtag.php", {
           subreddit: sub.subreddit,
           hashtag: tag.tag

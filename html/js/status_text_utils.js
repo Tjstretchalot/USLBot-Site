@@ -173,9 +173,7 @@ function __status_text_tick() {
 * @return a promise resolving after visible, before auto fold, with a promise for after auto fold
 */
 function set_status_text(st_div, new_text, new_alert_type, auto_fold, min_visible_duration = 2000) {
-  if(__status_text_div === null) {
-    __status_text_div = st_div;
-  }
+  __status_text_div = st_div;
 
   if(new_alert_type !== 'info' && new_alert_type !== 'danger' && new_alert_type !== 'success') {
     console.log('weird alert type: ' + new_alert_type);
