@@ -41,7 +41,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   /* SECONDARY VALIDATION */
-  $sub_row = DatabaseHelper::fetch_one($conn, 'SELECT id FROM monitored_subreddits WHERE subreddit = ?', array(array('s', $subreddit));
+  $sub_row = DatabaseHelper::fetch_one($conn, 'SELECT id FROM monitored_subreddits WHERE subreddit = ?', array(array('s', $subreddit)));
   if($sub_row === null) {
     echo_fail(404, 'ARGUMENT_INVALID', 'The bot does not track /r/' . $subreddit);
     $conn->close();
