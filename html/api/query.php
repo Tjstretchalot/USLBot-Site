@@ -12,18 +12,18 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   /* DEFAULT ARGUMENTS */
 
-  /* 
-   * Format options:
-   *  1: ultra-compact: returns things like { success: true, data: { person: 'john', banned: true, reason: '#scammer' } }
-   *  2: compact: returns things like { success: true, data: { person: 'john', grandfathered: false, history: { { kind: 'ban', subreddit: 'universalscammerlist', description: '#scammer', details: 'permanent', time: 1512412103 } } } }
-   */
-  $format = 1; 
+  /*
+  * Format options:
+  *  1: ultra-compact: returns things like { success: true, data: { person: 'john', banned: true, reason: '#scammer' } }
+  *  2: compact: returns things like { success: true, data: { person: 'john', grandfathered: false, history: { { kind: 'ban', subreddit: 'universalscammerlist', description: '#scammer', details: 'permanent', time: 1512412103 } } } }
+  */
+  $format = 1;
 
   /*
-   * Space seperated hashtags to search for, or the literal string 'all' for no restrictions.
-   * 
-   * All requires moderator permissions
-   */
+  * Space seperated hashtags to search for, or the literal string 'all' for no restrictions.
+  *
+  * All requires moderator permissions
+  */
   $hashtags = null;
 
   // What to search for in the username. Currently this is compared to the username
@@ -58,7 +58,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 
   /* VALIDATING ARGUMENTS */
-  
+
   if($format !== 1 && $format !== 2) {
     echo_fail(400, 'ARGUMENT_MISSING', 'Missing or invalid parameter format');
     return;
@@ -138,23 +138,23 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     if(!$meets_reqs) {
       foreach($hashtags as $tag) {
         if(strpos($row['description'], $tag) !== false) {
-	  $meets_reqs = true;
-	  break;
-	}
-      } 
+          $meets_reqs = true;
+          break;
+        }
+      }
     }
     if($meets_reqs) {
       $conn->close();
       if($format === 1) {
-	echo_success(array( 'person' => $person->username, 'banned' => true, 'reason' => $row['description']));
-	return;
+        echo_success(array( 'person' => $person->username, 'banned' => true, 'reason' => $row['description']));
+        return;
       }else {
-	echo_success(array( 'person' => $person->username, 'grandfathered' => true, 'description' => $row['description'], 'time' => strtotime($row['created_at']) ));
-	return;
+        echo_success(array( 'person' => $person->username, 'grandfathered' => true, 'description' => $row['description'], 'time' => strtotime($row['created_at']) ));
+        return;
       }
     }
   }
-  
+
 
   // Getting all ban histories, unfiltered
   $sql = 'SELECT * FROM ban_histories WHERE banned_person_id=?';
@@ -162,7 +162,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   check_db_error($conn, $err_prefix, $stmt->bind_param('i', $person->id));
   check_db_error($conn, $err_prefix, $stmt->execute());
   check_db_error($conn, $err_prefix, $res = $stmt->get_result());
-  
+
   $ban_history = array();
 
   while(($row = $res->fetch_assoc()) != null) {
@@ -172,7 +172,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $res->close();
   $stmt->close();
 
-  // Returning if there is no bans, unless we're searching for all (in 
+  // Returning if there is no bans, unless we're searching for all (in
   // which case we should return unpaired unbans)
   if(count($ban_history) === 0) {
     if($format === 1) {
@@ -206,36 +206,36 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 
   // Cleansing the ban_history of any bans that don't meet the search
-  // criteria, and keeping track of the ones we removed 
+  // criteria, and keeping track of the ones we removed
   $invalid_bhs = array();
   $changed_bhs = array();
   if(!$is_searching_all) {
     $valid_bhs = array();
     foreach($ban_history as $bh) {
       if(substr($bh['bh']['ban_details'], 0, strlen('changed to')) === 'changed to') {
-	$changed_bhs[] = $bh;
-	continue;
+        $changed_bhs[] = $bh;
+        continue;
       }
 
       $desc = $bh['bh']['ban_description'];
 
       if($desc === null) {
-	$invalid_bhs[] = $bh;
-	continue;
+        $invalid_bhs[] = $bh;
+        continue;
       }
 
       $found_tag = false;
       foreach($hashtags as $tag) {
         if(strpos($desc, $tag) !== false) {
-	  $found_tag = true;
-	  break;
-	}
+          $found_tag = true;
+          break;
+        }
       }
 
       if($found_tag) {
-	$valid_bhs[] = $bh;
+        $valid_bhs[] = $bh;
       }else {
-	$invalid_bhs[] = $bh;
+        $invalid_bhs[] = $bh;
       }
     }
 
@@ -257,19 +257,19 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     foreach($nonchanged_bhs as $bh2) {
       if(!isset($bh2['hma']['occurred_at__php'])) {
-	$bh2['hma']['occurred_at__php'] = strtotime($bh2['hma']['occurred_at']);
+        $bh2['hma']['occurred_at__php'] = strtotime($bh2['hma']['occurred_at']);
       }
 
       if($bh2['hma']['monitored_subreddit_id'] !== $bh['hma']['monitored_subreddit_id']) {
-	continue;
+        continue;
       }
 
       if($bh2['hma']['occurred_at__php'] > $bh['hma']['occurred_at__php']) {
-	continue;
+        continue;
       }
 
       if($most_applicable_bh !== null && $bh2['hma']['occurred_at__php'] < $most_applicable_bh['hma']['occurred_at__php']) {
-	continue;
+        continue;
       }
 
       $most_applicable_bh = $bh2;
@@ -288,7 +288,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   check_db_error($conn, $err_prefix, $stmt->bind_param('i', $person->id));
   check_db_error($conn, $err_prefix, $stmt->execute());
   check_db_error($conn, $err_prefix, $res = $stmt->get_result());
-  
+
   $unban_history = array();
 
   while(($row = $res->fetch_assoc()) != null) {
@@ -298,7 +298,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $res->close();
   $stmt->close();
 
-  // Fetching the corresponding handled_mod_action for the 
+  // Fetching the corresponding handled_mod_action for the
   // unban histories
   foreach($unban_history as $ubh) {
     $sql = 'SELECT * FROM handled_modactions WHERE id=?';
@@ -324,34 +324,34 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $missing_tags = array();
     foreach($hashtags as $tag) {
       if($tag !== 'all' && !in_array($tag, $missing_tags)) {
-	$missing_tags[] = $tag;
+        $missing_tags[] = $tag;
       }
     }
     if($is_searching_all) {
       foreach($NON_MODERATOR_HASHTAGS as $tag) {
-	if(!in_array($tag, $missing_tags)) {
-	  $missing_tags[] = $tag;
-	}
+        if(!in_array($tag, $missing_tags)) {
+          $missing_tags[] = $tag;
+        }
       }
     }
 
     if(count($ban_history) > 0 && count($unban_history) <= 0) {
       foreach($ban_history as $ban) {
-	for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
-	  $tag = $missing_tags[$missing_tags_index];
-	  if(strpos($ban['bh']['ban_description'], $tag) !== false) {
-	    $banned_tags[] = $tag;
-	    array_splice($missing_tags, $missing_tags_index, 1);
-	    break;
-	  }
-	}
+        for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
+          $tag = $missing_tags[$missing_tags_index];
+          if(strpos($ban['bh']['ban_description'], $tag) !== false) {
+            $banned_tags[] = $tag;
+            array_splice($missing_tags, $missing_tags_index, 1);
+            break;
+          }
+        }
       }
 
       $banned_tags_pretty = null;
       if(count($banned_tags) === 0) {
-	$banned_tags_pretty = 'no matching tags';
+        $banned_tags_pretty = 'no matching tags';
       }else {
-	$banned_tags_pretty = implode(', ', $banned_tags);
+        $banned_tags_pretty = implode(', ', $banned_tags);
       }
 
       echo_success(array('person' => $person->username, 'banned' => true, 'reason' => $banned_tags_pretty));
@@ -365,16 +365,16 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     foreach($ban_history as $bh) {
       $sub_id = $bh['hma']['monitored_subreddit_id'];
       if(!array_key_exists('occurred_at__php', $bh['hma'])) {
-	$bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
+        $bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
       }
       if(!array_key_exists($sub_id, $relevant_subreddits)) {
-	$relevant_subreddits[$sub_id] = true;
+        $relevant_subreddits[$sub_id] = true;
       }
 
       $newest_ban = $bh['hma']['occurred_at__php'];
       if(array_key_exists($sub_id, $subreddit_to_latest_ban)) {
-	if($subreddit_to_latest_ban[$sub_id]['time'] > $newest_ban)
-	  continue;
+        if($subreddit_to_latest_ban[$sub_id]['time'] > $newest_ban)
+        continue;
       }
 
       $subreddit_to_latest_ban[$sub_id] = array('time' => $newest_ban, 'ban' => $bh);
@@ -383,15 +383,15 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     foreach($unban_history as $ubh) {
       $sub_id = $ubh['hma']['monitored_subreddit_id'];
       if(!array_key_exists('occurred_at__php', $ubh['hma'])) {
-	$ubh['hma']['occurred_at__php'] = strtotime($ubh['hma']['occurred_at']);
+        $ubh['hma']['occurred_at__php'] = strtotime($ubh['hma']['occurred_at']);
       }
       if(!array_key_exists($sub_id, $relevant_subreddits)) {
-	$relevant_subreddits[$sub_id] = true;
+        $relevant_subreddits[$sub_id] = true;
       }
 
       $newest_unban = $ubh['hma']['occurred_at__php'];
       if(array_key_exists($sub_id, $subreddit_to_latest_unban)) {
-	$newest_unban = max($newest_unban, $subreddit_to_latest_unban);
+        $newest_unban = max($newest_unban, $subreddit_to_latest_unban);
       }
 
       $subreddit_to_latest_unban[$sub_id] = $newest_unban;
@@ -402,32 +402,32 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     foreach($relevant_subreddits as $rel_sub_id=>$dummy) {
       if(!array_key_exists($rel_sub_id, $subreddit_to_latest_ban)) {
-	continue;
+        continue;
       }
 
       $is_new_sub = false;
       if(!array_key_exists($rel_sub_id, $subreddit_to_latest_unban)) {
         $is_new_sub = true;
       }else {
-	$ban_time = $subreddit_to_latest_ban[$rel_sub_id]['time'];
-	$unban_time = $subreddit_to_latest_unban[$rel_sub_id];
+        $ban_time = $subreddit_to_latest_ban[$rel_sub_id]['time'];
+        $unban_time = $subreddit_to_latest_unban[$rel_sub_id];
 
-	if($ban_time > $unban_time) {
-	  $is_new_sub = true;
-	}
+        if($ban_time > $unban_time) {
+          $is_new_sub = true;
+        }
       }
 
       if($is_new_sub) {
-	$ban = $subreddit_to_latest_ban[$rel_sub_id]['ban'];
-	$banned_subreddits++;
-	for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
-	  $tag = $missing_tags[$missing_tags_index];
-	  if(strpos($ban['bh']['ban_description'], $tag) !== false) {
-	    $banned_tags[] = $tag;
-	    array_splice($missing_tags, $missing_tags_index, 1);
-	    break;
-	  }
-	}
+        $ban = $subreddit_to_latest_ban[$rel_sub_id]['ban'];
+        $banned_subreddits++;
+        for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
+          $tag = $missing_tags[$missing_tags_index];
+          if(strpos($ban['bh']['ban_description'], $tag) !== false) {
+            $banned_tags[] = $tag;
+            array_splice($missing_tags, $missing_tags_index, 1);
+            break;
+          }
+        }
       }
     }
 
@@ -436,9 +436,9 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if($banned_heuristic) {
       if(count($banned_tags) === 0) {
-	$banned_tags_pretty = 'no matching tags';
+        $banned_tags_pretty = 'no matching tags';
       }else {
-	$banned_tags_pretty = implode(', ', $banned_tags);
+        $banned_tags_pretty = implode(', ', $banned_tags);
       }
     }
 
@@ -455,18 +455,18 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     foreach($filt_bhs as $bh) {
       $comb[] = array(
         'kind' => 'ban',
-	'subreddit' => $bh['sub']['subreddit'],
-	'description' => $bh['bh']['ban_description'],
-	'details' => $bh['bh']['ban_details'],
-	'time' => strtotime($bh['hma']['occurred_at'])
+        'subreddit' => $bh['sub']['subreddit'],
+        'description' => $bh['bh']['ban_description'],
+        'details' => $bh['bh']['ban_details'],
+        'time' => strtotime($bh['hma']['occurred_at'])
       );
     }
 
     foreach($filt_ubhs as $ubh) {
       $comb[] = array(
         'kind' => 'unban',
-	'subreddit' => $ubh['sub']['subreddit'],
-	'time' => strtotime($ubh['hma']['occurred_at'])
+        'subreddit' => $ubh['sub']['subreddit'],
+        'time' => strtotime($ubh['hma']['occurred_at'])
       );
     }
 
@@ -519,19 +519,19 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $most_applicable_bh = null;
     foreach($all_bhs as $bh) {
       if(!isset($bh['hma']['occurred_at__php'])) {
-	$bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
+        $bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
       }
 
       if($bh['hma']['monitored_subreddit_id'] !== $ubh['hma']['monitored_subreddit_id']) {
-	continue;
+        continue;
       }
 
       if($bh['hma']['occurred_at__php'] > $ubh_occ_at_php) {
-	continue;
+        continue;
       }
 
       if($most_applicable_bh !== null && $bh['hma']['occurred_at__php'] < $most_applicable_bh['hma']['occurred_at__php']) {
-	continue;
+        continue;
       }
 
       $most_applicable_bh = $bh;
