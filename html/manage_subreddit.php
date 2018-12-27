@@ -264,7 +264,11 @@ if($auth_level < $MODERATOR_PERMISSION) {
       <div class="container-fluid alert" id="re-evaluate-status-text" style="display: none"></div>
       <form id="re-evaluate-form" class="form m-3">
         <div class="form-group row">
-          <textarea class="form-control" id="re-evaluate-reason" rows=3 aria-label="Reason for re-evaluating" placeholder="Reason"></textarea>
+          <textarea class="form-control" id="re-evaluate-reason" rows=3 aria-label="Reason for re-evaluating" aria-describedby="re-evaluate-reason-help" placeholder="Reason"></textarea>
+          <small id="re-evaluate-reason-help" class="form-text text-muted">
+            This is going to be posted on uslbotnotifications along with your username as a notification
+            for the other moderators about the temporary unresponsiveness of the bot.
+          </small>
         </div>
         <div class="form-group row">
           <div class="col col-lg-3">
