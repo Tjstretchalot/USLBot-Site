@@ -2,6 +2,7 @@
 require_once 'api/common.php';
 require_once 'database/persons.php';
 require_once 'database/register_account_requests.php';
+require_once 'database/helper.php';
 
 if($_SERVER['REQUEST_METHOD'] === 'GET') {
   /* CONSTANTS */
@@ -154,7 +155,6 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       }
     }
   }
-
 
   // Getting all ban histories, unfiltered
   $sql = 'SELECT * FROM ban_histories WHERE banned_person_id=?';
@@ -318,136 +318,154 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt->close();
   }
 
-  // At this point we can return for the format type 1
   if($format === 1) {
-    $banned_tags = array();
-    $missing_tags = array();
-    foreach($hashtags as $tag) {
-      if($tag !== 'all' && !in_array($tag, $missing_tags)) {
-        $missing_tags[] = $tag;
-      }
-    }
-    if($is_searching_all) {
-      foreach($NON_MODERATOR_HASHTAGS as $tag) {
-        if(!in_array($tag, $missing_tags)) {
+    $is_prop_row = DatabaseHelper::fetch_one($conn, 'SELECT property_value FROM propagator_settings WHERE property_key=?',
+      array(array('s', 'suppress_no_op')));
+    if($is_prop_row !== null && $is_prop_row->property_value !== 'false') {
+      // We have to fallback to the old method since we are repropagating
+      $banned_tags = array();
+      $missing_tags = array();
+      foreach($hashtags as $tag) {
+        if($tag !== 'all' && !in_array($tag, $missing_tags)) {
           $missing_tags[] = $tag;
         }
       }
-    }
-
-    if(count($ban_history) > 0 && count($unban_history) <= 0) {
-      foreach($ban_history as $ban) {
-        for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
-          $tag = $missing_tags[$missing_tags_index];
-          if(strpos($ban['bh']['ban_description'], $tag) !== false) {
-            $banned_tags[] = $tag;
-            array_splice($missing_tags, $missing_tags_index, 1);
-            break;
+      if($is_searching_all) {
+        foreach($NON_MODERATOR_HASHTAGS as $tag) {
+          if(!in_array($tag, $missing_tags)) {
+            $missing_tags[] = $tag;
           }
         }
       }
-
-      $banned_tags_pretty = null;
-      if(count($banned_tags) === 0) {
-        $banned_tags_pretty = 'no matching tags';
-      }else {
-        $banned_tags_pretty = implode(', ', $banned_tags);
+      if(count($ban_history) > 0 && count($unban_history) <= 0) {
+        foreach($ban_history as $ban) {
+          for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
+            $tag = $missing_tags[$missing_tags_index];
+            if(strpos($ban['bh']['ban_description'], $tag) !== false) {
+              $banned_tags[] = $tag;
+              array_splice($missing_tags, $missing_tags_index, 1);
+              break;
+            }
+          }
+        }
+        $banned_tags_pretty = null;
+        if(count($banned_tags) === 0) {
+          $banned_tags_pretty = 'no matching tags';
+        }else {
+          $banned_tags_pretty = implode(', ', $banned_tags);
+        }
+        echo_success(array('person' => $person->username, 'banned' => true, 'reason' => $banned_tags_pretty, 'fallback' => true));
+        $conn->close();
+        return;
       }
-
-      echo_success(array('person' => $person->username, 'banned' => true, 'reason' => $banned_tags_pretty));
+      $relevant_subreddits = array();
+      $subreddit_to_latest_ban = array();
+      $subreddit_to_latest_unban = array();
+      foreach($ban_history as $bh) {
+        $sub_id = $bh['hma']['monitored_subreddit_id'];
+        if(!array_key_exists('occurred_at__php', $bh['hma'])) {
+          $bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
+        }
+        if(!array_key_exists($sub_id, $relevant_subreddits)) {
+          $relevant_subreddits[$sub_id] = true;
+        }
+        $newest_ban = $bh['hma']['occurred_at__php'];
+        if(array_key_exists($sub_id, $subreddit_to_latest_ban)) {
+          if($subreddit_to_latest_ban[$sub_id]['time'] > $newest_ban)
+          continue;
+        }
+        $subreddit_to_latest_ban[$sub_id] = array('time' => $newest_ban, 'ban' => $bh);
+      }
+      foreach($unban_history as $ubh) {
+        $sub_id = $ubh['hma']['monitored_subreddit_id'];
+        if(!array_key_exists('occurred_at__php', $ubh['hma'])) {
+          $ubh['hma']['occurred_at__php'] = strtotime($ubh['hma']['occurred_at']);
+        }
+        if(!array_key_exists($sub_id, $relevant_subreddits)) {
+          $relevant_subreddits[$sub_id] = true;
+        }
+        $newest_unban = $ubh['hma']['occurred_at__php'];
+        if(array_key_exists($sub_id, $subreddit_to_latest_unban)) {
+          $newest_unban = max($newest_unban, $subreddit_to_latest_unban);
+        }
+        $subreddit_to_latest_unban[$sub_id] = $newest_unban;
+      }
+      $total_subreddits = count($relevant_subreddits);
+      $banned_subreddits = 0;
+      foreach($relevant_subreddits as $rel_sub_id=>$dummy) {
+        if(!array_key_exists($rel_sub_id, $subreddit_to_latest_ban)) {
+          continue;
+        }
+        $is_new_sub = false;
+        if(!array_key_exists($rel_sub_id, $subreddit_to_latest_unban)) {
+          $is_new_sub = true;
+        }else {
+          $ban_time = $subreddit_to_latest_ban[$rel_sub_id]['time'];
+          $unban_time = $subreddit_to_latest_unban[$rel_sub_id];
+          if($ban_time > $unban_time) {
+            $is_new_sub = true;
+          }
+        }
+        if($is_new_sub) {
+          $ban = $subreddit_to_latest_ban[$rel_sub_id]['ban'];
+          $banned_subreddits++;
+          for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
+            $tag = $missing_tags[$missing_tags_index];
+            if(strpos($ban['bh']['ban_description'], $tag) !== false) {
+              $banned_tags[] = $tag;
+              array_splice($missing_tags, $missing_tags_index, 1);
+              break;
+            }
+          }
+        }
+      }
+      $banned_heuristic = $banned_subreddits > ($total_subreddits / 2.0);
+      $banned_tags_pretty = null;
+      if($banned_heuristic) {
+        if(count($banned_tags) === 0) {
+          $banned_tags_pretty = 'no matching tags';
+        }else {
+          $banned_tags_pretty = implode(', ', $banned_tags);
+        }
+      }
+      echo_success(array('person' => $person->username, 'banned' => $banned_heuristic, 'reason' => $banned_tags_pretty, 'fallback' => true));
       $conn->close();
       return;
     }
 
-    $relevant_subreddits = array();
-    $subreddit_to_latest_ban = array();
-    $subreddit_to_latest_unban = array();
-    foreach($ban_history as $bh) {
-      $sub_id = $bh['hma']['monitored_subreddit_id'];
-      if(!array_key_exists('occurred_at__php', $bh['hma'])) {
-        $bh['hma']['occurred_at__php'] = strtotime($bh['hma']['occurred_at']);
-      }
-      if(!array_key_exists($sub_id, $relevant_subreddits)) {
-        $relevant_subreddits[$sub_id] = true;
-      }
-
-      $newest_ban = $bh['hma']['occurred_at__php'];
-      if(array_key_exists($sub_id, $subreddit_to_latest_ban)) {
-        if($subreddit_to_latest_ban[$sub_id]['time'] > $newest_ban)
-        continue;
-      }
-
-      $subreddit_to_latest_ban[$sub_id] = array('time' => $newest_ban, 'ban' => $bh);
+    $action = DatabaseHelper::fetch_one($conn, 'SELECT id FROM usl_actions WHERE is_latest = 1 AND person_id = ? LIMIT 1',
+      array(array('i', $person->id)));
+    if($action === null) {
+      echo_success(array('person' => $person->username, 'banned' => false));
+      $conn->close();
+      return;
     }
 
-    foreach($unban_history as $ubh) {
-      $sub_id = $ubh['hma']['monitored_subreddit_id'];
-      if(!array_key_exists('occurred_at__php', $ubh['hma'])) {
-        $ubh['hma']['occurred_at__php'] = strtotime($ubh['hma']['occurred_at']);
-      }
-      if(!array_key_exists($sub_id, $relevant_subreddits)) {
-        $relevant_subreddits[$sub_id] = true;
-      }
+    $tags = DatabaseHelper::fetch_all($conn, join('', array(
+      'SELECT hashtags.tag as tag FROM usl_action_hashtags ',
+      'JOIN hashtags ON usl_action_hashtags.hashtag_id = hashtags.id ',
+      'WHERE usl_action_hashtags.usl_action_id = ?'
+    )), array(array('i', $action->id)));
 
-      $newest_unban = $ubh['hma']['occurred_at__php'];
-      if(array_key_exists($sub_id, $subreddit_to_latest_unban)) {
-        $newest_unban = max($newest_unban, $subreddit_to_latest_unban);
-      }
-
-      $subreddit_to_latest_unban[$sub_id] = $newest_unban;
-    }
-
-    $total_subreddits = count($relevant_subreddits);
-    $banned_subreddits = 0;
-
-    foreach($relevant_subreddits as $rel_sub_id=>$dummy) {
-      if(!array_key_exists($rel_sub_id, $subreddit_to_latest_ban)) {
-        continue;
-      }
-
-      $is_new_sub = false;
-      if(!array_key_exists($rel_sub_id, $subreddit_to_latest_unban)) {
-        $is_new_sub = true;
-      }else {
-        $ban_time = $subreddit_to_latest_ban[$rel_sub_id]['time'];
-        $unban_time = $subreddit_to_latest_unban[$rel_sub_id];
-
-        if($ban_time > $unban_time) {
-          $is_new_sub = true;
-        }
-      }
-
-      if($is_new_sub) {
-        $ban = $subreddit_to_latest_ban[$rel_sub_id]['ban'];
-        $banned_subreddits++;
-        for($missing_tags_index = count($missing_tags) - 1; $missing_tags_index >= 0; $missing_tags_index--) {
-          $tag = $missing_tags[$missing_tags_index];
-          if(strpos($ban['bh']['ban_description'], $tag) !== false) {
-            $banned_tags[] = $tag;
-            array_splice($missing_tags, $missing_tags_index, 1);
-            break;
-          }
-        }
+    $filtered_tags = array();
+    foreach($tags as $tag) {
+      $found = $is_searching_all || in_array($tag->tag, $hashtags);
+      if($found) {
+        $filtered_tags[] = $tag->tag;
       }
     }
 
-    $banned_heuristic = $banned_subreddits > ($total_subreddits / 2.0);
-    $banned_tags_pretty = null;
-
-    if($banned_heuristic) {
-      if(count($banned_tags) === 0) {
-        $banned_tags_pretty = 'no matching tags';
-      }else {
-        $banned_tags_pretty = implode(', ', $banned_tags);
-      }
+    if(count($filtered_tags) === 0) {
+      echo_success(array('person' => $person->username, 'banned' => false));
+      $conn->close();
+      return;
     }
 
-    echo_success(array('person' => $person->username, 'banned' => $banned_heuristic, 'reason' => $banned_tags_pretty));
+    $banned_tags_pretty = implode(', ', $filtered_tags);
+    echo_success(array('person' => $person->username, 'banned' => true, 'reason' => $banned_tags_pretty));
     $conn->close();
     return;
   }
-
-  // From here we assume we want format type 2
 
   function create_combined($filt_bhs, $filt_ubhs) {
     $comb = array();

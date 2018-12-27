@@ -1,6 +1,6 @@
 <?php
 include 'pagestart.php';
-include 'api/common.php'; 
+include 'api/common.php';
 
 $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
 ?>
@@ -58,6 +58,17 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
       </form>
       <hr />
       <h3 id="person-name"></h3>
+      <div id="fallback-card" class="card bg-warning mb-3" style="display: none">
+        <div class="card-header">Fallback</div>
+        <div class="card-body">
+          <h5 class="card-title">Database being re-evaluated</h5>
+          <p class="card-text">The bot has been reconfigured by the moderators recently, which
+          requires a large amount of processing which has not completed yet. During this time, the
+          website falls back to a more error-prone technique to determine if users are banned,
+          which has the same result in the majority of cases. This process usually takes a couple
+          of hours.</p>
+        </div>
+      </div>
       <div id="output-not-grandfathered">
         <table id="not-gfather-table" class="table">
           <thead>
@@ -89,143 +100,155 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
     <script src="js/footable.min.js"></script>
 
     <script type="text/javascript">
-      jQuery(function($){
-	$('.table').footable();
-	$('[data-toggle="tooltip"]').tooltip();
+    jQuery(function($){
+      $('.table').footable();
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    function handleDataSimple(data) {
+      $("#output-grandfathered").slideUp('fast');
+      $("#output-not-grandfathered").slideUp('fast');
+
+      if(data.data.fallback) {
+        if($("#fallback-card").is(":hidden")) {
+          $("#fallback-card").slideDown('fast');
+        }
+      }else if($("#fallback-card").is(":visible")) {
+        $("#fallback-card").slideUp('false');
+      }
+
+      if(data.data.banned) {
+        $("#simple-p").html("This user is <b style=\"font-size: larger; color: red;\">banned</b>. Reason: " + data.data.reason);
+      }else {
+        $("#simple-p").html("This user is <b style=\"color:green;\">not banned</b>.");
+      }
+
+      $("#output-simple").slideDown('fast', function() {
+        $("#search_for").removeAttr('disabled');
       });
+    }
+
+    function handleDataComplex(data) {
+      if($("#fallback-card").is(":visible")) {
+        $("#fallback-card").slideUp('false');
+      }
       
-      function handleDataSimple(data) {
-	$("#output-grandfathered").slideUp('fast');
-	$("#output-not-grandfathered").slideUp('fast');
+      $("#output-simple").slideUp('fast');
+      if(!data.data.grandfathered) {
+        $("#output-grandfathered").slideUp('fast');
+        var wrapper = $("#output-not-grandfathered");
+        var table = $("#not-gfather-table");
+        var tbody = $("#not-gfather-tbody");
+        wrapper.slideUp('fast', function() {
+          tbody.empty();
 
-	if(data.data.banned) {
-	  $("#simple-p").html("This user is <b style=\"font-size: larger; color: red;\">banned</b>. Reason: " + data.data.reason);
-	}else {
-	  $("#simple-p").html("This user is <b style=\"color:green;\">not banned</b>.");
-	}
+          data.data.history.sort(function(a, b) { return b.time - a.time; });
 
-	$("#output-simple").slideDown('fast', function() {
-	  $("#search_for").removeAttr('disabled');
-	});
-      }
-
-      function handleDataComplex(data) {
-	$("#output-simple").slideUp('fast');
-	if(!data.data.grandfathered) {
-	  $("#output-grandfathered").slideUp('fast');
-	  var wrapper = $("#output-not-grandfathered");
-	  var table = $("#not-gfather-table");
-	  var tbody = $("#not-gfather-tbody");
-	  wrapper.slideUp('fast', function() {
-	    tbody.empty();
-
-	    data.data.history.sort(function(a, b) { return b.time - a.time; });
-
-	    var new_html = "";
-	    for(var i = 0; i < data.data.history.length; i++) {
-	      var ele = data.data.history[i];
-	      new_html += "<tr>";
-	      new_html += "<td>" + ele.kind + "</td>";
-	      new_html += "<td>" + ele.subreddit + "</td>";
-	      new_html += "<td>" + ele.description + "</td>";
-	      new_html += "<td>" + ele.details + "</td>";
-	      new_html += "<td>" + $.timeago(new Date(ele.time * 1000)) + "</td>";
-	      new_html += "</tr>";
-	    }
-	    tbody.html(new_html);
-	    table.footable();
-	    wrapper.slideDown('fast', function() { 
-	      $("#search_for").removeAttr('disabled');
-	    });
-	  });
-	}else {
-	  $("#output-not-grandfathered").slideUp('fast');
-
-	  $("#output-grandfathered").slideUp('fast', function() {
-	    $("#gfather-banned-desc").html(data.data.description);
-	    $("#output-grandfathered").slideDown('fast', function() {
-	      $("#search_for").removeAttr('disabled');
-	    });
-	  });
-	}
-      }
-<?php if($all_auth): ?>
-      $('#all-checkbox').change(function() {
-	$('#scammer-checkbox').attr('disabled', this.checked);
-	$('#sketchy-checkbox').attr('disabled', this.checked);
-	$('#troll-checkbox').attr('disabled', this.checked);
-      });
-<?php endif; ?>
-
-      $("#search-form").on('submit', function(e) {
-        e.preventDefault();
-        
-        var hashtags = [];
-        if($("#scammer-checkbox").is(":checked")) {
-          hashtags.push("#scammer");
-        }
-        if($("#sketchy-checkbox").is(":checked")) {
-          hashtags.push("#sketchy");
-        }
-        if($("#troll-checkbox").is(":checked")) {
-          hashtags.push("#troll");
-        }<?php if($all_auth): ?>
-	if($('#all-checkbox').is(':checked')) {
-	  hashtags = [ 'all' ];
-	}<?php endif;?>
-
-	var format = 1;
-	if($("#detailed-checkbox").is(":checked")) {
-	  format = 2;
-	}
-
-        $("#search_for").attr('disabled', true);
-	statusText = $("#statusText");
-        $.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: format }, function(data, stat) {
-	  statusText.slideUp('fast');
-	  $("#person-name").fadeOut('fast', function() {
-	    $("#person-name").html(data.data.person);
-	    $("#person-name").fadeIn('fast');
-	  });
-
-	  if(format === 1) {
-	    handleDataSimple(data);
-	  }else {
-	    handleDataComplex(data);
-	  }
-        }).fail(function(xhr) {
-          var json_resp = xhr.responseJSON;
-	  if(json_resp !== null && json_resp !== undefined && json_resp.error_type !== null) {
-            console.log(xhr.responseJSON);
-	    var err_type = json_resp.error_type;
-	    var err_mess = json_resp.error_message;
-	    console.log(err_type + ": " + err_mess);
-
-	    statusText.fadeOut('fast', function() {
-	      statusText.removeClass("alert-success").removeClass("alert-info");
-	      statusText.addClass("alert-danger");
-	      statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
-	      $("#search_for").removeAttr('disabled');
-	      statusText.fadeIn('fast');
-	    });
-	  }else {
-	    var err_mess = '';
-	    if(xhr.status === 0) {
-	      err_mess = 'You do not appear to be connected to the internet';
-	    }else {
-	      err_mess = xhr.status + ' ' + xhr.statusText;
-	    }
-
-	    statusText.fadeOut('fast', function() {
-	      statusText.removeClass("alert-success").removeClass("alert-info");
-	      statusText.addClass("alert-danger");
-	      statusText.html("<span class=\"glyphicon glyphicon-remove\"><span> Oops! Something went wrong. Error: " + err_mess);
-	      $("#search_for").removeAttr('disabled');
-	      statusText.fadeIn('fast');
-	    });
-	  }
+          var new_html = "";
+          for(var i = 0; i < data.data.history.length; i++) {
+            var ele = data.data.history[i];
+            new_html += "<tr>";
+            new_html += "<td>" + ele.kind + "</td>";
+            new_html += "<td>" + ele.subreddit + "</td>";
+            new_html += "<td>" + ele.description + "</td>";
+            new_html += "<td>" + ele.details + "</td>";
+            new_html += "<td>" + $.timeago(new Date(ele.time * 1000)) + "</td>";
+            new_html += "</tr>";
+          }
+          tbody.html(new_html);
+          table.footable();
+          wrapper.slideDown('fast', function() {
+            $("#search_for").removeAttr('disabled');
+          });
         });
+      }else {
+        $("#output-not-grandfathered").slideUp('fast');
+
+        $("#output-grandfathered").slideUp('fast', function() {
+          $("#gfather-banned-desc").html(data.data.description);
+          $("#output-grandfathered").slideDown('fast', function() {
+            $("#search_for").removeAttr('disabled');
+          });
+        });
+      }
+    }
+    <?php if($all_auth): ?>
+    $('#all-checkbox').change(function() {
+      $('#scammer-checkbox').attr('disabled', this.checked);
+      $('#sketchy-checkbox').attr('disabled', this.checked);
+      $('#troll-checkbox').attr('disabled', this.checked);
+    });
+    <?php endif; ?>
+
+    $("#search-form").on('submit', function(e) {
+      e.preventDefault();
+
+      var hashtags = [];
+      if($("#scammer-checkbox").is(":checked")) {
+        hashtags.push("#scammer");
+      }
+      if($("#sketchy-checkbox").is(":checked")) {
+        hashtags.push("#sketchy");
+      }
+      if($("#troll-checkbox").is(":checked")) {
+        hashtags.push("#troll");
+      }<?php if($all_auth): ?>
+      if($('#all-checkbox').is(':checked')) {
+        hashtags = [ 'all' ];
+      }<?php endif;?>
+
+      var format = 1;
+      if($("#detailed-checkbox").is(":checked")) {
+        format = 2;
+      }
+
+      $("#search_for").attr('disabled', true);
+      statusText = $("#statusText");
+      $.get("/api/query.php", { query: $("#search_for").val(), hashtags: hashtags.join(','), format: format }, function(data, stat) {
+        statusText.slideUp('fast');
+        $("#person-name").fadeOut('fast', function() {
+          $("#person-name").html(data.data.person);
+          $("#person-name").fadeIn('fast');
+        });
+
+        if(format === 1) {
+          handleDataSimple(data);
+        }else {
+          handleDataComplex(data);
+        }
+      }).fail(function(xhr) {
+        var json_resp = xhr.responseJSON;
+        if(json_resp !== null && json_resp !== undefined && json_resp.error_type !== null) {
+          console.log(xhr.responseJSON);
+          var err_type = json_resp.error_type;
+          var err_mess = json_resp.error_message;
+          console.log(err_type + ": " + err_mess);
+
+          statusText.fadeOut('fast', function() {
+            statusText.removeClass("alert-success").removeClass("alert-info");
+            statusText.addClass("alert-danger");
+            statusText.html("<span class=\"glyphicon glyphicon-remove\"></span> " + err_mess);
+            $("#search_for").removeAttr('disabled');
+            statusText.fadeIn('fast');
+          });
+        }else {
+          var err_mess = '';
+          if(xhr.status === 0) {
+            err_mess = 'You do not appear to be connected to the internet';
+          }else {
+            err_mess = xhr.status + ' ' + xhr.statusText;
+          }
+
+          statusText.fadeOut('fast', function() {
+            statusText.removeClass("alert-success").removeClass("alert-info");
+            statusText.addClass("alert-danger");
+            statusText.html("<span class=\"glyphicon glyphicon-remove\"><span> Oops! Something went wrong. Error: " + err_mess);
+            $("#search_for").removeAttr('disabled');
+            statusText.fadeIn('fast');
+          });
+        }
       });
+    });
     </script>
   </body>
 </html>
