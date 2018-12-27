@@ -243,6 +243,9 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       $(function () {
         $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle=confirmation]').confirmation({
+          rootSelector: '[data-toggle=confirmation]'
+        });
 
         reload_subreddits();
       });
