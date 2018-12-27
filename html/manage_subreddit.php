@@ -260,6 +260,21 @@ if($auth_level < $MODERATOR_PERMISSION) {
           no other subreddit configuration will be achievable during this time.</p>
         </div>
       </div>
+
+      <div class="container-fluid alert" id="re-evaluate-status-text" style="display: none"></div>
+      <form id="re-evaluate-form" class="form mb-3">
+        <div class="form-group row">
+          <textarea class="form-control" id="re-evaluate-reason" rows=3 aria-label="Reason for re-evaluating" placeholder="Reason"></textarea>
+        </div>
+        <div class="form-group row">
+          <div class="col col-lg-3">
+            <button type="button" class="btn btn-warning" data-toggle="confirmation" data-confirmation-event="confirmed" id="re-evaluate-button-1">Enable real button</button>
+          </div>
+          <div class="col col-lg-3">
+            <button type="submit" class="btn btn-danger" data-toggle="confirmation" data-confirmation-event="confirmed" id="re-evaluate-button-2" disabled>Re-evaluate</button>
+          </div>
+        </div>
+      </form>
     </div>
 
     <?php include 'footer.php'; ?>
@@ -579,6 +594,23 @@ if($auth_level < $MODERATOR_PERMISSION) {
         }).fail(function(xhr) {
       	  set_status_text_from_xhr(st_div, xhr);
       	});
+      });
+
+      $("#re-evaluate-reason").on('change', function() {
+        $("#re-evaluate-button-2").prop('disabled', true);
+      });
+
+      $("#re-evaluate-button-1").on('confirmed', function(e) {
+        e.preventDefault();
+        $("#re-evaluate-button-2").prop('disabled', false);
+      });
+
+      $("#re-evaluate-button-2").on('confirmed', function(e) {
+        e.preventDefault();
+        $("#re-evaluate-button-2").prop('disabled', true);
+
+        reason = $("#re-evaluate-reason").val();
+        console.log(`re-evaluate with reason: ${reason}`);
       });
     </script>
   </body>
