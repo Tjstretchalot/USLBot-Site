@@ -41,7 +41,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $read_only = intval($_POST['read_only']);
   }
 
-  if(isset($_POST['write_only']) && is_numeric($_POST['write_only']))) {
+  if(isset($_POST['write_only']) && is_numeric($_POST['write_only'])) {
     $write_only = intval($_POST['write_only']);
   }
 
