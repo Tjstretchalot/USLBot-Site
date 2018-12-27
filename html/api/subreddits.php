@@ -48,7 +48,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       'subreddit' => $sub->subreddit,
       'silent' => $sub->silent,
       'read_only' => $sub->read_only,
-      'write_only', $sub->write_only
+      'write_only' => $sub->write_only
     );
 
     $alt_modmails = DatabaseHelper::fetch_all($conn, 'SELECT subreddit FROM subreddit_alt_modmail WHERE monitored_subreddit_id=?', array(array('i', $sub->id)));
