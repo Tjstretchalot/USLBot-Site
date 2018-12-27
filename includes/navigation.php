@@ -40,6 +40,10 @@ if($logged_in_person === null) {
       'link' => '/add_subreddit.php',
       'name' => 'Add Sub'
     );
+    $pages[] = array(
+      'link' => '/manage_subreddit.php',
+      'name' => 'Settings'
+    )
   }
 
   $pages[] = array(
@@ -61,7 +65,7 @@ if($logged_in_person === null) {
       <ul class="navbar-nav mr-auto">
         <?php foreach($pages as $key=>$page): ?>
 	<?php if ($_SERVER['REQUEST_URI'] == $page['link'] || ($_SERVER['REQUEST_URI'] == '/' && $page['link'] == '/index.php')): ?>
-	  <li class="nav-item active"> 
+	  <li class="nav-item active">
 	    <a class="nav-link" href="#"><?= $page['name'] ?> <span class="sr-only">(current)</span></a>
 	  </li>
 	<?php else: ?>
