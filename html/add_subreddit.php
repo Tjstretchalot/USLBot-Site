@@ -14,7 +14,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <link rel="stylesheet" href="css/footable.standalone.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -46,7 +46,8 @@ if ($auth_level < $MODERATOR_PERMISSION) {
             <input type="text" class="form-control" id="add-subreddit" aria-label="The subreddit to add" placeholder="The subreddit to add">
             <small id="addSubHelp" class="form-text text-muted">The subreddit to add to the USLBot's tracked database. This will take effect on the next loop. Do not do this multiple times. This action is not reversible;
               once a subreddit has been added this way the only way to "remove" it is to mark it write-only and read-only. Please triple-check for typos. <b>There should NOT BE a prefix.</b> Case doesn't matter but it's
-              preferred to match the case on reddit. Correct example: Care</small>
+              preferred to match the case on reddit. Correct example: Care. Note that unless you check "suppress-repropagate" this will cause a repropagation step (which takes several hours!), but if you do then that
+              step still needs to be done before the subreddit is truly added, and you must do so on the settings (aka manage subreddit) page (see navbar).</small>
             </div>
             <div class="form-group row justify-content-around">
               <div class="form-check col-auto">
@@ -88,22 +89,36 @@ if ($auth_level < $MODERATOR_PERMISSION) {
               </div>
             </div>
             <div class="form-group row">
-              <button id="add-sub-but" type="submit" class="col-auto btn btn-primary">Submit</button>
+              <div class="form-check col-auto">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="checkbox" id="suppress-repropagate-checkbox"> Suppress Repropagation
+                </label>
+              </div>
+              <div class="col-auto">
+                <button id="add-sub-but" type="submit" class="col-auto btn btn-primary" data-toggle="confirmation" data-confirmation-event="confirmed">Submit</button>
+              </div>
             </div>
           </form>
         </div>
         <?php include 'footer.php'; ?>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
         <script src="js/jquery.timeago.js"></script>
         <script src="js/moment.js"></script>
         <script src="js/footable.min.js"></script>
+        <script src="js/bootstrap-confirmation.min.js"></script>
 
         <script type="text/javascript">
         jQuery(function($){
           $('.table').footable();
           $('[data-toggle="tooltip"]').tooltip();
+
+          $('[data-toggle=confirmation]').confirmation({
+            rootSelector: '[data-toggle=confirmation]',
+            popout: true,
+            singleton: true
+          });
         });
 
         function handleXHR(statusText, xhr) {
@@ -215,7 +230,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
           });
         });
 
-        $('#add-sub-form').on('submit', function(e) {
+        $('#add-sub-but').on('confirmed', function(e) {
           e.preventDefault();
 
           var statusText = $("#status-text-add-sub");
@@ -223,6 +238,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
           var silent = $("#silent-checkbox").is(":checked") ? 1 : 0;
           var readOnly = $("#read-only-checkbox").is(":checked") ? 1 : 0;
           var writeOnly = $("#write-only-checkbox").is(":checked") ? 1 : 0;
+          var suppressReprop = $("#suppress-repropagate-checkbox").is(":checked") ? 1 : 0;
 
           var hashtags = [];
           if($("#scammer-checkbox").is(":checked")) {
@@ -245,7 +261,14 @@ if ($auth_level < $MODERATOR_PERMISSION) {
             $("#acc-inv-but").attr("disabled", true);
             $("#add-sub-but").attr("disabled", true);
             statusText.slideDown("fast", function() {
-              $.post('https://universalscammerlist.com/api/add_subreddit.php', { subreddit: subreddit, hashtags: hashtags.join(' '), silent: silent, read_only: readOnly, write_only: writeOnly }, function(succ) {
+              $.post('https://universalscammerlist.com/api/add_subreddit.php', {
+                  subreddit: subreddit,
+                  hashtags: hashtags.join(' '),
+                  silent: silent,
+                  read_only: readOnly,
+                  write_only: writeOnly,
+                  suppress_repropagate: suppressReprop
+                }, function(succ) {
                 console.log(succ);
                 statusText.fadeOut('fast', function() {
                   statusText.removeClass("alert-info").removeClass("alert-danger");
