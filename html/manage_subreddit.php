@@ -454,12 +454,13 @@ if($auth_level < $MODERATOR_PERMISSION) {
         var alt_modmails = alt_modmails_input.val().split(',').join(' ')
 
     	  set_status_text(st_div, LOADING_GLYPHICON + 'Editing subreddit...', 'info', true, 250);
-        $.post("https://universalscammerlist.com/edit_subreddit.php", {
+        $.post("https://universalscammerlist.com/api/edit_subreddit.php", {
           subreddit: sub.subreddit,
           silent: (silent_checkbox.is(":checked") ? 1 : 0),
           read_only: (read_only_checkbox.is(":checked") ? 1 : 0),
           write_only: (write_only_checkbox.is(":checked") ? 1 : 0),
-          remap_modmail: alt_modmails
+          remap_modmail: alt_modmails,
+          suppress_repropagate: 1
         }, function(data, stat) {
           set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Reloading subreddits from server...', 'success', true, 250);
           reload_subreddits().then(function() {
