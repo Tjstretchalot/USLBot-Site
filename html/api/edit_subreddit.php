@@ -150,7 +150,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach($remap_modmail_arr as $new_mm) {
       $found = false;
       foreach($old_remap_modmail as $old_mm) {
-        if($old_mm->subredit === $new_mm) {
+        if($old_mm->subreddit === $new_mm) {
           $found = true;
           break;
         }
