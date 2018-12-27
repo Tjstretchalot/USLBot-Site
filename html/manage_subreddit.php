@@ -613,8 +613,16 @@ if($auth_level < $MODERATOR_PERMISSION) {
         e.preventDefault();
         $("#re-evaluate-button-2").prop('disabled', true);
 
-        reason = $("#re-evaluate-reason").val();
+        var reason = $("#re-evaluate-reason").val();
         console.log(`re-evaluate with reason: ${reason}`);
+
+        var st_div = $("#re-evaluate-status-text");
+    	  set_status_text(st_div, LOADING_GLYPHICON + 'Requesting re-evaluation...', 'info', true, 3000);
+        $.post("https://universalscammerlist.com/api/request_repropagate.php", { reason: reason }, function(data, stat) {
+          set_status_text(st_div, SUCCESS_GLYPHICON + 'Request sent successfully. Monitor /r/uslbotnotifications, your pms, and the logs to see how it goes.', 'success', true, 5000);
+        }).fail(function(xhr) {
+      	  set_status_text_from_xhr(st_div, xhr);
+      	});
       });
     </script>
   </body>
