@@ -41,14 +41,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   /* SECONDARY VALIDATION */
-  $sub_row = DatabaseHelper::fetch_one($conn, 'SELECT id FROM monitored_subreddits WHERE subreddit = ?', array('s', $subreddit));
+  $sub_row = DatabaseHelper::fetch_one($conn, 'SELECT id FROM monitored_subreddits WHERE subreddit = ?', array(array('s', $subreddit));
   if($sub_row === null) {
     echo_fail(404, 'ARGUMENT_INVALID', 'The bot does not track /r/' . $subreddit);
     $conn->close();
     return;
   }
 
-  $tag_row = DatabaseHelper::fetch_one($conn, 'SELECT id FROM hashtags WHERE tag = ?', array('s', $hashtag));
+  $tag_row = DatabaseHelper::fetch_one($conn, 'SELECT id FROM hashtags WHERE tag = ?', array(array('s', $hashtag)));
   if($tag_row === null) {
     echo_fail(404, 'ARGUMENT_INVALID', "You must register the tag '$hashtag' before you can subscribe to it");
     $conn->close();
