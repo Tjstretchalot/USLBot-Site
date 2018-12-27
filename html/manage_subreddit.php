@@ -167,7 +167,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
             </small>
           </div>
           <div class="form-group row ml-3">
-            <button type="button" class="btn btn-warning" data-toggle="confirmation" id="edit-sub-submit-button">Edit Subreddit</button>
+            <button type="button" class="btn btn-warning" data-toggle="confirmation" data-confirmation-event="confirmed" id="edit-sub-submit-button">Edit Subreddit</button>
           </div>
         </form>
       </div>
@@ -244,7 +244,9 @@ if($auth_level < $MODERATOR_PERMISSION) {
       $(function () {
         $('[data-toggle="tooltip"]').tooltip();
         $('[data-toggle=confirmation]').confirmation({
-          rootSelector: '[data-toggle=confirmation]'
+          rootSelector: '[data-toggle=confirmation]',
+          popout: true,
+          singleton: true
         });
 
         reload_subreddits();
@@ -437,7 +439,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
         });
       });
 
-      $("#edit-sub-submit-button").click(function(e) {
+      $("#edit-sub-submit-button").on('confirmed', function(e) {
         e.preventDefault();
 
         var ind = parseInt($("#edit-sub-select-select").val());
