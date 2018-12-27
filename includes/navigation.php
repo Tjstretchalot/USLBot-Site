@@ -43,7 +43,7 @@ if($logged_in_person === null) {
     $pages[] = array(
       'link' => '/manage_subreddit.php',
       'name' => 'Settings'
-    )
+    );
   }
 
   $pages[] = array(
