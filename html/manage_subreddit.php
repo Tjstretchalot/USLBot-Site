@@ -596,7 +596,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
       	});
       });
 
-      $("#re-evaluate-reason").on('change', function() {
+      $("#re-evaluate-reason").bind('input', function() {
         $("#re-evaluate-button-2").prop('disabled', true);
       });
 
