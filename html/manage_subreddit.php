@@ -279,7 +279,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       function reload_subreddits() {
         return new Promise(function(resolve, reject) {
-          var sub_selects = $("#view-subreddits-select-select, #edit-sub-select-select, #sub-to-tag-select-sub");
+          var sub_selects = $("#view-subreddits-select-select, #edit-sub-select-select, #sub-to-tag-select-sub, #unsub-from-tag-select-sub");
           $.get('https://universalscammerlist.com/api/subreddits.php', {}, function(data, stat) {
             subreddits = data.data.subreddits;
         	  for(var i = 0; i < subreddits.length; i++) {
@@ -361,7 +361,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
         e.preventDefault();
 
         var st_div = $("#view-tags-select-status-text");
-        var tag_selects = $("#view-tags-select-select, #sub-to-tag-select-tag");
+        var tag_selects = $("#view-tags-select-select, #sub-to-tag-select-tag, #unsub-from-tag-select-tag");
         $.get('https://universalscammerlist.com/api/hashtags.php', {}, function(data, stat) {
           tag_selects.empty();
 
