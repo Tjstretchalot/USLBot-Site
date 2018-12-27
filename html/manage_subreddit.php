@@ -124,53 +124,52 @@ if($auth_level < $MODERATOR_PERMISSION) {
           existing bans under the new changes. If you completely undo your changes, you do not need
           to re-evaluate.</p>
         </div>
+      </div>
+      <p>This allows you to configure the basic settings for a subreddit. You need to repropagate if
+      you change the write only or read only settings, but otherwise you do not.</p>
 
-        <p>This allows you to configure the basic settings for a subreddit. You need to repropagate if
-        you change the write only or read only settings, but otherwise you do not.</p>
+      <div class="container-fluid alert" id="edit-sub-status-text" style="display: none"></div>
+      <form id="edit-sub-select-form" class="mb-3">
+        <select id="edit-sub-select-select">
+        </select>
+      </form>
 
-        <div class="container-fluid alert" id="edit-sub-status-text" style="display: none"></div>
-        <form id="edit-sub-select-form" class="mb-3">
-          <select id="edit-sub-select-select">
-          </select>
+      <div class="card bg-light mb-3" id="edit-sub-result-card" style="display: none">
+        <div class="card-header" id="edit-sub-result-header">Subreddit</div>
+
+        <form id="edit-sub-form" class="mt-3 mb-3">
+          <div class="form-group row justify-content-around">
+            <div class="form-check col-auto">
+              <label class="form-check-label">
+                <input class="form-check-input" type="checkbox" id="edit-sub-silent-checkbox" checked> Silent
+              </label>
+            </div>
+            <div class="form-check col-auto">
+              <label class="form-check-label">
+                <input class="form-check-input" type="checkbox" id="edit-sub-write-only-checkbox"> Write-Only
+              </label>
+            </div>
+            <div class="form-check col-auto">
+              <label class="form-check-label">
+                <input class="form-check-input" type="checkbox" id="edit-sub-read-only-checkbox"> Read-Only
+              </label>
+            </div>
+          </div>
+          <div class="form-group row">
+            <input type="text" class="form-control flexdatalist"
+                   data-min-length="1" multiple="multiple" list="edit-sub-alt-modmails"
+                   id="edit-sub-alt-modmails-input" aria-describedby="edit-sub-alt-modmails-input-help">
+            <datalist id="edit-sub-alt-modmails">
+              <option value="uslbotnotifications">uslbotnotifications</option>
+            </datalist>
+            <small id="edit-sub-alt-modmails-input-help" class="form-text text-muted">
+              Use enter ↵ to <strong>add</strong> values.
+            </small>
+          </div>
+          <div class="form-group row">
+            <button type="button" class="btn btn-warning" data-toggle="confirmation" id="edit-sub-submit-button">Edit Subreddit</button>
+          </div>
         </form>
-
-        <div class="card bg-light mb-3" id="edit-sub-result-card" style="display: none">
-          <div class="card-header" id="edit-sub-result-header">Subreddit</div>
-
-          <form id="edit-sub-form" class="mt-3 mb-3">
-            <div class="form-group row justify-content-around">
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="edit-sub-silent-checkbox" checked> Silent
-                </label>
-              </div>
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="edit-sub-write-only-checkbox"> Write-Only
-                </label>
-              </div>
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="edit-sub-read-only-checkbox"> Read-Only
-                </label>
-              </div>
-            </div>
-            <div class="form-group row">
-              <input type="text" class="form-control flexdatalist"
-                     data-min-length="1" multiple="multiple" list="edit-sub-alt-modmails"
-                     id="edit-sub-alt-modmails-input" aria-describedby="edit-sub-alt-modmails-input-help">
-              <datalist id="edit-sub-alt-modmails">
-                <option value="uslbotnotifications">uslbotnotifications</option>
-              </datalist>
-              <small id="edit-sub-alt-modmails-input-help" class="form-text text-muted">
-                Use enter ↵ to <strong>add</strong> values.
-              </small>
-            </div>
-            <div class="form-group row">
-              <button type="button" class="btn btn-warning" data-toggle="confirmation" id="edit-sub-submit-button">Edit Subreddit</button>
-            </div>
-          </form>
-        </div>
       </div>
 
       <h2>Subscribe To Tags</h2>
