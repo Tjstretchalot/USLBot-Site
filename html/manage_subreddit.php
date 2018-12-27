@@ -173,7 +173,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
       </div>
 
       <h2>Subscribe To Tags</h2>
-      <div class="card bg-warning mb-3">
+      <div class="card bg-warning mb-2">
         <div class="card-header">Retroactive Action</div>
         <div class="card-body">
           <h5 class="card-title">Requires re-evaluation</h5>
@@ -184,19 +184,30 @@ if($auth_level < $MODERATOR_PERMISSION) {
           to re-evaluate.</p>
         </div>
       </div>
+      <div class="card bg-info mb-3">
+        <div class="card-header">Requires tag list</div>
+        <div class="card-body">
+          <h5 class="card-title">Fetch tags</h5>
+          <p class="card-text">You must "fetch tags" before you are able to use this section,
+          which is available in the view/edit/add tag information section.</p>
+        </div>
+      </div>
+
       <p>Subscribing to tags always requires re-evaluation, since old bans which previously did not
-      effect the subreddit now do. You must "fetch tags" before you are able to use this section,
-      which is available in the view/edit/add tag information section.</p>
+      effect the subreddit now do.</p>
 
       <div class="container-fluid alert" id="sub-to-tag-status-text" style="display: none"></div>
-      <form id="sub-to-tag-select-form" class="form-inline mb-3">
-        <div class="col-6 col-lg-3">
+      <form id="sub-to-tag-form" class="form-inline mb-3">
+        <div class="col col-lg-4">
           <select class="form-control" id="sub-to-tag-select-sub">
           </select>
         </div>
-        <div class="col-6 col-lg-3">
+        <div class="col col-lg-4">
           <select class="form-control" id="sub-to-tag-select-tag">
           </select>
+        </div>
+        <div class="col col-lg-4">
+          <button type="submit" class="btn btn-warning" data-toggle="confirmation" data-confirmation-event="confirmed" id="sub-to-tag-submit">Subscribe</button>
         </div>
       </form>
 
@@ -212,6 +223,32 @@ if($auth_level < $MODERATOR_PERMISSION) {
           to re-evaluate.</p>
         </div>
       </div>
+      <div class="card bg-info mb-3">
+        <div class="card-header">Requires tag list</div>
+        <div class="card-body">
+          <h5 class="card-title">Fetch tags</h5>
+          <p class="card-text">You must "fetch tags" before you are able to use this section,
+          which is available in the view/edit/add tag information section.</p>
+        </div>
+      </div>
+
+      <p>Unsubscribing from tags always requires re-evaluation, since bans which previously had
+      meaning no longer do.</p>
+
+      <div class="container-fluid alert" id="unsub-from-tag-status-text" style="display: none"></div>
+      <form id="unsub-from-tag-form" class="form-inline mb-3">
+        <div class="col col-lg-4">
+          <select class="form-control" id="unsub-from-tag-select-sub">
+          </select>
+        </div>
+        <div class="col col-lg-4">
+          <select class="form-control" id="unsub-from-tag-select-tag">
+          </select>
+        </div>
+        <div class="col col-lg-4">
+          <button type="submit" class="btn btn-warning" data-toggle="confirmation" data-confirmation-event="confirmed" id="unsub-from-tag-submit">Unsubscribe</button>
+        </div>
+      </form>
 
       <h2>Request Re-evaluate Reddit-to-Meaning</h2>
       <div class="card bg-danger text-white mb-3">
@@ -476,6 +513,62 @@ if($auth_level < $MODERATOR_PERMISSION) {
           write_only: (write_only_checkbox.is(":checked") ? 1 : 0),
           remap_modmail: alt_modmails,
           suppress_repropagate: 1
+        }, function(data, stat) {
+          set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Reloading subreddits from server...', 'success', true, 250);
+          reload_subreddits().then(function() {
+            set_status_text(st_div, SUCCESS_GLYPHICON + 'Success!', 'success', true, 5000);
+          }).catch(function(e) {
+            set_status_text_from_xhr(st_div, e);
+          });
+        }).fail(function(xhr) {
+      	  set_status_text_from_xhr(st_div, xhr);
+      	});
+      });
+
+      $("#sub-to-tag-submit").on("confirmed", function(e) {
+        e.preventDefault();
+        if(subreddits === null || cached_tags === null) { return; }
+
+        var sub_ind = parseInt($("#sub-to-tag-select-sub").val());
+        var tag_ind = parseInt($("#sub-to-tag-select-tag").val());
+
+        var sub = subreddits[sub_ind];
+        var tag = cached_tags[tag_ind];
+
+        var st_div = $("#sub-to-tag-status-text");
+
+    	  set_status_text(st_div, LOADING_GLYPHICON + 'Subscribing to tag...', 'info', true, 250);
+        $.post("https://universalscammerlist.com/api/add_subscribed_hashtag.php", {
+          subreddit: sub.subreddit,
+          hashtag: tag.tag
+        }, function(data, stat) {
+          set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Reloading subreddits from server...', 'success', true, 250);
+          reload_subreddits().then(function() {
+            set_status_text(st_div, SUCCESS_GLYPHICON + 'Success!', 'success', true, 5000);
+          }).catch(function(e) {
+            set_status_text_from_xhr(st_div, e);
+          });
+        }).fail(function(xhr) {
+      	  set_status_text_from_xhr(st_div, xhr);
+      	});
+      });
+
+      $("#unsub-from-tag-submit").on("confirmed", function(e) {
+        e.preventDefault();
+        if(subreddits === null || cached_tags === null) { return; }
+
+        var sub_ind = parseInt($("#unsub-from-tag-select-sub").val());
+        var tag_ind = parseInt($("#unsub-from-tag-select-tag").val());
+
+        var sub = subreddits[sub_ind];
+        var tag = cached_tags[tag_ind];
+
+        var st_div = $("#unsub-from-tag-status-text");
+
+    	  set_status_text(st_div, LOADING_GLYPHICON + 'Subscribing to tag...', 'info', true, 250);
+        $.post("https://universalscammerlist.com/api/del_subscribed_hashtag.php", {
+          subreddit: sub.subreddit,
+          hashtag: tag.tag
         }, function(data, stat) {
           set_status_text(st_div, SUCCESS_GLYPHICON + 'Success! Reloading subreddits from server...', 'success', true, 250);
           reload_subreddits().then(function() {
