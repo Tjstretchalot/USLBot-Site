@@ -17,6 +17,8 @@ if ($auth_level < $MODERATOR_PERMISSION) {
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <link rel="stylesheet" href="css/footable.standalone.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/jquery.flexdatalist.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
 </head>
 <body>
   <?php include 'navigation.php'; ?>
@@ -49,44 +51,42 @@ if ($auth_level < $MODERATOR_PERMISSION) {
               preferred to match the case on reddit. Correct example: Care. Note that unless you check "suppress-repropagate" this will cause a repropagation step (which takes several hours!), but if you do then that
               step still needs to be done before the subreddit is truly added, and you must do so on the settings (aka manage subreddit) page (see navbar).</small>
             </div>
-            <div class="form-group row justify-content-around">
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="silent-checkbox" checked> Silent
-                </label>
-              </div>
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="write-only-checkbox"> Write-Only
-                </label>
-              </div>
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="read-only-checkbox"> Read-Only
-                </label>
+            <div class="form-group">
+              <label>Configuration</label>
+              <div class="row justify-content-around">
+                <div class="form-check col-auto">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" id="silent-checkbox" checked> Silent
+                  </label>
+                </div>
+                <div class="form-check col-auto">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" id="write-only-checkbox"> Write-Only
+                  </label>
+                </div>
+                <div class="form-check col-auto">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" id="read-only-checkbox"> Read-Only
+                  </label>
+                </div>
               </div>
             </div>
-            <div class="form-group row justify-content-around">
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="scammer-checkbox" checked> #scammer
-                </label>
-              </div>
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="sketchy-checkbox" checked> #sketchy
-                </label>
-              </div>
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="troll-checkbox" checked> #troll
-                </label>
-              </div>
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="compromised-checkbox" checked> #compromised
-                </label>
-              </div>
+            <div class="form-group">
+              <label for="hashtags-select">Tags</label>
+              <select class="form-control" id="hashtags-select" multiple>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="modmails-input">Modmails</label>
+              <input type="text" class="form-control flexdatalist"
+                       data-min-length="1" multiple="multiple" list="modmails-list"
+                       id="modmails-input" aria-describedby="modmails-help">
+              <datalist id="modmails-list">
+                <option value="uslbotnotifications">uslbotnotifications</option>
+              </datalist>
+              <small id="modmails-help" class="form-text text-muted">
+                Use enter ↵ to <strong>add</strong> values.
+              </small>
             </div>
             <div class="form-group row">
               <div class="form-check col-auto">
@@ -107,10 +107,14 @@ if ($auth_level < $MODERATOR_PERMISSION) {
         <script src="js/jquery.timeago.js"></script>
         <script src="js/moment.js"></script>
         <script src="js/footable.min.js"></script>
+        <script src="js/jquery.flexdatalist.min.js"></script>
         <script src="js/bootstrap-confirmation.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
 
         <script type="text/javascript">
-        jQuery(function($){
+        var cached_tags = null;
+
+        $(function() {
           $('.table').footable();
           $('[data-toggle="tooltip"]').tooltip();
 
@@ -119,6 +123,21 @@ if ($auth_level < $MODERATOR_PERMISSION) {
             popout: true,
             singleton: true
           });
+
+          var st_div = $("#status-text-acc-inv");
+          var tag_selects = $("#hashtags-select");
+          $.get('https://universalscammerlist.com/api/hashtags.php', {}, function(data, stat) {
+            tag_selects.empty();
+
+            cached_tags = data.data.hashtags;
+            for(var i = 0; i < cached_tags.length; i++) {
+              tag_selects.append($("<option>", { value: i, text: cached_tags[i].tag }));
+            }
+
+            tag_selects.selectpicker();
+          }).fail(function(xhr) {
+        	  set_status_text_from_xhr(st_div, xhr);
+        	});
         });
 
         function handleXHR(statusText, xhr) {
@@ -240,18 +259,15 @@ if ($auth_level < $MODERATOR_PERMISSION) {
           var writeOnly = $("#write-only-checkbox").is(":checked") ? 1 : 0;
           var suppressReprop = $("#suppress-repropagate-checkbox").is(":checked") ? 1 : 0;
 
-          var hashtags = [];
-          if($("#scammer-checkbox").is(":checked")) {
-            hashtags.push("#scammer");
-          }
-          if($("#sketchy-checkbox").is(":checked")) {
-            hashtags.push("#sketchy");
-          }
-          if($("#troll-checkbox").is(":checked")) {
-            hashtags.push("#troll");
-          }
-          if($("#compromised-checkbox").is(":checked")) {
-            hashtags.push("#compromised");
+          var hashtags = $("#hashtags-select").val().join(" ");
+          var modmails = $("#modmails-input").val().split(",").join(" ");
+
+          console.log(`subreddit=${subreddit}, silent=${silent}, readOnly=${readOnly}, writeOnly=${writeOnly}`);
+          console.log(`suppressReprop=${suppressReprop}`);
+          console.log(`hashtags=${hashtags}`);
+          console.log(`modmails=${modmails}`);
+          if(true) {
+            return;
           }
 
           statusText.slideUp('fast', function() {
