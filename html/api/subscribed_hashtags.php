@@ -25,7 +25,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     return;
   }
 
-  if($logged_in_person->auth_level < $MODERATOR_PERMISSION) {
+  if($auth_level < $MODERATOR_PERMISSION) {
     echo_fail(403, 'Access denied, insufficient permission');
     $conn->close();
     return;

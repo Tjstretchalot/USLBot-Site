@@ -27,7 +27,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     return;
   }
 
-  if($logged_in_person->auth_level < $MODERATOR_PERMISSION) {
+  if($auth_level < $MODERATOR_PERMISSION) {
     echo_fail(403, 'Access denied, insufficient permission');
     $conn->close();
     return;
@@ -37,7 +37,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     array('i', $logged_in_person->id),
     array('i', $id),
   ));
-  
+
   if($row === null) {
     echo_fail(400, 'NOT_FOUND', 'There is no request with that id!');
     $conn->close();
