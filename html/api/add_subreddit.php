@@ -168,7 +168,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     return;
   }
 
-  $params = array()
+  $params = array();
   foreach($hashtags_arr as $hashtag) {
     $params[] = array('s', $hashtag);
   }
