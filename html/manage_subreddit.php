@@ -90,10 +90,15 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       <div class="container-fluid alert" id="view-tags-select-status-text" style="display: none"></div>
       <form id="view-tags-select-form" class="mb-3">
-        <button type="button" class="btn btn-primary" id="view-tags-fetch-btn">Fetch Tags</button>
-
-        <select id="view-tags-select-select" class="form-control">
-        </select>
+        <div class="form-group row justify-content-between">
+          <div class="col-4">
+            <button type="button" class="btn btn-primary" id="view-tags-fetch-btn">Fetch Tags</button>
+          </div>
+          <div class="col-6">
+            <select id="view-tags-select-select" class="form-control">
+            </select>
+          </div>
+        </div>
       </form>
 
       <div class="card bg-light mb-3" id="view-tag-result-card" style="display: none">
@@ -130,8 +135,12 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       <div class="container-fluid alert" id="edit-sub-status-text" style="display: none"></div>
       <form id="edit-sub-select-form" class="mb-3">
-        <select id="edit-sub-select-select" class="form-control">
-        </select>
+        <div class="form-group row">
+          <div class="col col-md-6 col-lg-4">
+            <select id="edit-sub-select-select" class="form-control">
+            </select>
+          </div>
+        </div>
       </form>
 
       <div class="card bg-light mb-3" id="edit-sub-result-card" style="display: none">
