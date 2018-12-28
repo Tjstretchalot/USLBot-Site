@@ -276,10 +276,11 @@ if ($auth_level < $MODERATOR_PERMISSION) {
             statusText.slideDown("fast", function() {
               $.post('https://universalscammerlist.com/api/add_subreddit.php', {
                   subreddit: subreddit,
-                  hashtags: hashtags.join(' '),
+                  hashtags: hashtags,
                   silent: silent,
                   read_only: readOnly,
                   write_only: writeOnly,
+                  remap_modmail: modmails,
                   suppress_repropagate: suppressReprop
                 }, function(succ) {
                 console.log(succ);
