@@ -38,7 +38,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       <div class="container-fluid alert" id="view-subreddits-select-status-text" style="display: none"></div>
       <form id="view-subreddits-select-form" class="mb-3">
-        <select id="view-subreddits-select-select">
+        <select id="view-subreddits-select-select" class="form-control">
         </select>
       </form>
 
@@ -90,11 +90,11 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       <div class="container-fluid alert" id="view-tags-select-status-text" style="display: none"></div>
       <form id="view-tags-select-form" class="mb-3">
-        <div class="form-group row justify-content-between">
-          <div class="col-4">
+        <div class="form-group row justify-content-start">
+          <div class="col-auto">
             <button type="button" class="btn btn-primary" id="view-tags-fetch-btn">Fetch Tags</button>
           </div>
-          <div class="col-6">
+          <div class="col">
             <select id="view-tags-select-select" class="form-control">
             </select>
           </div>
