@@ -92,7 +92,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
       <form id="view-tags-select-form" class="mb-3">
         <button type="button" class="btn btn-primary" id="view-tags-fetch-btn">Fetch Tags</button>
 
-        <select id="view-tags-select-select">
+        <select id="view-tags-select-select" class="form-control">
         </select>
       </form>
 
@@ -130,7 +130,7 @@ if($auth_level < $MODERATOR_PERMISSION) {
 
       <div class="container-fluid alert" id="edit-sub-status-text" style="display: none"></div>
       <form id="edit-sub-select-form" class="mb-3">
-        <select id="edit-sub-select-select">
+        <select id="edit-sub-select-select" class="form-control">
         </select>
       </form>
 
