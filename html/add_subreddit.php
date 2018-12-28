@@ -259,7 +259,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
           var writeOnly = $("#write-only-checkbox").is(":checked") ? 1 : 0;
           var suppressReprop = $("#suppress-repropagate-checkbox").is(":checked") ? 1 : 0;
 
-          var hashtags = $("#hashtags-select").val().join(" ");
+          var hashtags = $("#hashtags-select").val().map(id => cached_tags[id].tag).join(" ");
           var modmails = $("#modmails-input").val().split(",").join(" ");
 
           console.log(`subreddit=${subreddit}, silent=${silent}, readOnly=${readOnly}, writeOnly=${writeOnly}`);
