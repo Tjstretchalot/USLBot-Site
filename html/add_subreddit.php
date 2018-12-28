@@ -266,9 +266,6 @@ if ($auth_level < $MODERATOR_PERMISSION) {
           console.log(`suppressReprop=${suppressReprop}`);
           console.log(`hashtags=${hashtags}`);
           console.log(`modmails=${modmails}`);
-          if(true) {
-            return;
-          }
 
           statusText.slideUp('fast', function() {
             statusText.removeClass("alert-danger").removeClass("alert-success");
