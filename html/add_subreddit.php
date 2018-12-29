@@ -36,8 +36,8 @@ if ($auth_level < $MODERATOR_PERMISSION) {
           <small id="accInvSubHelp" class="form-text text-muted">The subreddit who you believe has sent the USLBot an invite. The USLBot will attempt to accept the invite, though it might take a few minutes. You will
             receive feedback here for when the USLBot has processed this request, but you should double-check on reddit</small>
           </div>
-          <div class="form-group row">
-            <button id="acc-inv-but" type="submit" class="col-auto btn btn-primary">Submit</button>
+          <div class="form-group">
+            <button id="acc-inv-but" type="submit" class="btn btn-primary">Submit</button>
           </div>
         </form>
 
