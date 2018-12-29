@@ -93,14 +93,18 @@ if ($auth_level < $MODERATOR_PERMISSION) {
                 in the chat. It's up to the subreddit if they want to also get modmail.
               </small>
             </div>
-            <div class="form-group row">
-              <div class="form-check col-auto">
-                <label class="form-check-label">
-                  <input class="form-check-input" type="checkbox" id="suppress-repropagate-checkbox"> Suppress Repropagation
-                </label>
-              </div>
-              <div class="col-auto">
-                <button id="add-sub-but" type="submit" class="col-auto btn btn-primary" data-toggle="confirmation" data-confirmation-event="confirmed">Submit</button>
+            <div class="form-group">
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="form-check col-auto">
+                    <label class="form-check-label">
+                      <input class="form-check-input" type="checkbox" id="suppress-repropagate-checkbox"> Suppress Repropagation
+                    </label>
+                  </div>
+                  <div class="col-auto">
+                    <button id="add-sub-but" type="submit" class="col-auto btn btn-primary" data-toggle="confirmation" data-confirmation-event="confirmed">Submit</button>
+                  </div>
+                </div>
               </div>
             </div>
           </form>
