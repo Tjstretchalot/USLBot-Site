@@ -85,7 +85,12 @@ if ($auth_level < $MODERATOR_PERMISSION) {
                 <option value="uslbotnotifications">uslbotnotifications</option>
               </datalist>
               <small id="modmails-help" class="form-text text-muted">
-                Use enter ↵ to <strong>add</strong> values.
+                Use enter ↵ to <strong>add</strong> values. Every item should be a subreddit. These are how the subreddit
+                is notified by the uslbot. If the bot wants to send the subreddit a notification, it does so as follows:
+                For each item on the modmail list, if the item is the original subreddit then send the original subreddit
+                modmail. Otherwise, *post* on that subreddit. It is encouraged to subscribe every subreddit to
+                uslbotnotifications so that if they have any questions about a notification they can just tag /u/Tjstretchalot
+                in the chat. It's up to the subreddit if they want to also get modmail.
               </small>
             </div>
             <div class="form-group row">
