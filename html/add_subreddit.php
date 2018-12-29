@@ -31,7 +31,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
       <h2>Accept Moderator Invite</h2>
       <div class="container-fluid alert" id="status-text-acc-inv" style="display: none"></div>
       <form id="acc-inv-form">
-        <div class="form-group row">
+        <div class="form-group">
           <input type="text" class="form-control" id="acc-inv-subreddit" aria-label="The subreddit to accept the mod invite for" placeholder="The subreddit to accept moderator invite for" aria-describedby="accInvSubHelp">
           <small id="accInvSubHelp" class="form-text text-muted">The subreddit who you believe has sent the USLBot an invite. The USLBot will attempt to accept the invite, though it might take a few minutes. You will
             receive feedback here for when the USLBot has processed this request, but you should double-check on reddit</small>
@@ -44,7 +44,7 @@ if ($auth_level < $MODERATOR_PERMISSION) {
         <h2>Add subreddit</h2>
         <div class="container-fluid alert" id="status-text-add-sub" style="display: none"></div>
         <form id="add-sub-form">
-          <div class="form-group row">
+          <div class="form-group">
             <input type="text" class="form-control" id="add-subreddit" aria-label="The subreddit to add" placeholder="The subreddit to add">
             <small id="addSubHelp" class="form-text text-muted">The subreddit to add to the USLBot's tracked database. This will take effect on the next loop. Do not do this multiple times. This action is not reversible;
               once a subreddit has been added this way the only way to "remove" it is to mark it write-only and read-only. Please triple-check for typos. <b>There should NOT BE a prefix.</b> Case doesn't matter but it's
