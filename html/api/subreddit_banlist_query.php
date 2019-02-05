@@ -117,7 +117,7 @@ WHERE handled_modactions.occurred_at >= FROM_UNIXTIME(? / 1000)
 SQL;
   $newer_unban = DatabaseHelper::fetch_one($conn, $q,
     array(array('i', $latest_ban->occurred_at), array('i', $monsub->id), array('i', $person->id)));
-  if($new_unban) {
+  if($new_unban !== null) {
     echo_success(array('username' => $person->username, 'banned' => false, 'found' => true));
   }else {
     echo_success(array(
