@@ -115,6 +115,9 @@ WHERE handled_modactions.occurred_at >= FROM_UNIXTIME(? / 1000)
   AND handled_modactions.monitored_subreddit_id = ?
   AND unban_histories.unbanned_person_id = ?
 SQL;
+  error_log('q=' . $q);
+  error_log('occurred_at=' . $latest_ban->occurred_at);
+  error_log('person_id=' . $person->id);
   $newer_unban = DatabaseHelper::fetch_one($conn, $q,
     array(array('i', $latest_ban->occurred_at), array('i', $monsub->id), array('i', $person->id)));
   if($new_unban !== null) {
