@@ -9,7 +9,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   /* PARSING ARGUMENTS */
   if(isset($_POST['username'])) {
-    $username = $_POST['username'];
+    $username = trim($_POST['username']);
   }
 
   /* VALIDATING ARGUMENTS */
