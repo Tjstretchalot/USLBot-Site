@@ -24,7 +24,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   for($i = 0; $i < strlen($username); $i++) {
-    $ch = $username[i];
+    $ch = $username[$i];
     if((!ctype_alnum($ch) && $ch !== '_' && $ch !== '-') || ctype_space($ch)) {
       echo_fail(400, 'ARGUMENT_INVALID', "Invalid character in username (pos $i has '$ch')");
       return;
