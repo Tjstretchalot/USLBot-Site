@@ -87,7 +87,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
         $hashtag_params[] = array('i', $ht->id);
     }
 
-    $bot_ban_ids = DatabaseHelper::fetch_all($conn, 'SELECT id FROM persons WHERE username=\'USLBot\'');
+    $bot_ban_ids = DatabaseHelper::fetch_all($conn, 'SELECT id FROM persons WHERE username=\'USLBot\'', array());
 
     $blacklist_mods = array();
     foreach($bot_ban_ids as $bbid) {
