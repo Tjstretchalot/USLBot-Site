@@ -1,140 +1,133 @@
 <?php
 /**
-  Returns a json array that contains one of two types of element, wrapped like so:
-
-  { 
-    success: true,
-    data: [ { ... }, { ... }, ... ]
-  {
-  
-  New-style ban: { username: 'johndoe', ban_reason: '#scammer on /r/Gameswap', banned_at: <utc timestamp in ms> }
-  Old-style ban: { username: 'johndoe', traditional: true, ban_reason: 'grandfathered' }
-
-  This is meant to be queried for other apis. Its best to use the optional parameter 'since', which only returns bans
-  which occurred after a specified date. You can use the since parameter to update internal databases. Because
-  dates are based of reddit times, it may be a good idea to leave some wiggle room in the updates. For example,
-  if you want to update your database every day, fetch the history from up to two days ago and merge it in. The
-  usernames are unique.
-
-  Because the database is too large for this server to store in memory, a limit of 1000 returned rows is required.
-  In order to paginate, this would be the workflow
-
-    get bulk_query.php - just returns the traditional scammers
-    get bulk_query.php?offset=0 - returns first (large number of rows). the exact number of rows may vary 
-    get bulk_query.php?offset=num_rows_from_last_time
-
-    (repeatedly increment offset until you get no response)
-
-
-  When using this endpoint, PLEASE include your username in the user agent!
-*/
+ * Performs a bulk query of users who are on the universal scammer list. Only available while the
+ * bot is not propagating. This API endpoint was changed around 03/31/2019 thus you must pass
+ * the version parameter to get the new behavior.
+ *
+ * This endpoint assumes you are querying for the common tags '#scammer', '#sketchy', and '#troll'.
+ * You paginate this endpoint by checking the biggest id returned
+ *
+ * Arguments:
+ *      - version (int, default 1): the version of this endpoint. Current behavior is '2'
+ *      - start_id (int, default 0): the start id (exclusive). This takes the place of "offset" in
+ *          the original endpoint. You will get at least "limit" results. For traditional scammers
+ *          you should use the "bulk_traditional.php" endpoint.
+ *      - limit (int, default 250, max 250, min 1): the number of results to return. You may
+ *          get fewer results
+ *
+ * Returns:
+ * {
+ *   success: true,
+ *   data: {
+ *      bans: [ { ... }, { ... }, ... ],
+ *      next_id: int
+ *   }
+ * }
+ *
+ * Where each ban item is of the form:
+ *      { username: 'johndoe', ban_reason: '#scammer on /r/Gameswap', banned_at: <utc timestamp in ms> }
+ *
+ * When using this endpoint, PLEASE include your username in the user agent!
+ */
 
 require_once 'api/common.php';
 require_once 'database/persons.php';
-require_once 'database/register_account_requests.php';
 
 if($_SERVER['REQUEST_METHOD'] === 'GET') {
-  /* CONSTANTS */
-  $err_prefix = 'bulk_query.php';
+    // DEFAULT ARGUMENTS
+    $version = 1;
+    $start_id = 0;
+    $limit = 250;
 
-  // The hashtags that non-moderators are allowed to search for
-  $NON_MODERATOR_HASHTAGS = array( '#sketchy', '#scammer', '#troll' );
-
-  /* DEFAULT ARGUMENTS */
-  $since = null; 
-
-  $offset = null;
-
-  /* PARSING ARGUMENTS */
-  if(isset($_GET['since']) && is_numeric($_GET['since'])) {
-    $since = intval($_GET['since']);
-  }
-
-  if(isset($_GET['offset']) && is_numeric($_GET['offset'])) {
-    $offset = intval($_GET['offset']);
-  }
-
-  if($since !== null && $since < 0) {
-    echo_fail(400, 'ARGUMENT_INVALID', 'Invalid \'since\' argument (must be nonnegative). Simply do not specify this parameter for the full history');
-    return;
-  }
-
-  if($offset !== null && $offset < 0) {
-    echo_fail(400, 'ARGUMENT_INVALID', 'Invalid \'offset\' argument (must be nonnegative). Specify null for the traditional scammers or 0 for the first batch of new scammers');
-    return;
-  }
-
-  $result = array();
-
-  require_once('pagestart.php');
-  
-  // If they don't specify an offset we only return traditional scammers
-  if($offset === null) {
-    $sql = 'SELECT ps.username, ts.reason FROM traditional_scammers ts INNER JOIN persons ps ON ts.person_id = ps.id'; 
-    check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
-    check_db_error($conn, $err_prefix, $stmt->execute());
-    check_db_error($conn, $err_prefix, $res = $stmt->get_result());
-    
-    while($row = $res->fetch_array()) {
-      $result[] = array( 'username' => $row[0], 'traditional' => true, 'ban_reason' => $row[1] );
+    if(isset($_GET['version']) && is_numeric($_GET['version'])) {
+        $version = intval($_GET['version']);
     }
-    
-    $res->close();
-    $stmt->close();
-    echo_success($result);
+
+    if($version === 1) {
+        include_once 'api/bulk_query_old.php';
+        return;
+    }
+
+    if($version !== 2) {
+        echo_fail(400, 'INVALID_ARGUMENT', 'version must be either 1 (old version) or 2 (current version)');
+        return;
+    }
+
+    if(isset($_GET['start_id']) && is_numeric($_GET['start_id'])) {
+        $start_id = intval($_GET['start_id']);
+    }
+
+    if(isset($_GET['limit']) && is_numeric($_GET['limit'])) {
+        $limit = intval($_GET['limit']);
+    }
+
+    // VALIDATING ARGUMENTS
+    if($limit <= 0) {
+        echo_fail(400, 'INVALID_ARGUMENT', 'limit must be positive');
+        return;
+    }
+
+    // PERFORMING REQUEST
+    require_once 'pagestart.php';
+    require_once 'database/helper.php';
+
+    $is_prop_row = DatabaseHelper::fetch_one($conn, 'SELECT property_value FROM propagator_settings WHERE property_key=?',
+      array(array('s', 'suppress_no_op')));
+    if($is_prop_row !== null && $is_prop_row->property_value !== 'false') {
+        echo_fail(503, 'SERVICE_UNAVAILABLE', 'The bot is currently repropagating and this endpoint is not available until that concludes.');
+        $conn->close();
+        return;
+    }
+
+    $raw_hashtags = DatabaseHelper::fetch_all($conn, 'SELECT id FROM hashtags WHERE tag IN (?, ?, ?) LIMIT 3',
+                        array(array('s', '#scammer'), array('s', '#sketchy'), array('s', '#troll')));
+
+    $hashtag_params = array();
+    foreach($raw_hashtags as $ht) {
+        $hashtag_params[] = array('i', $ht->id);
+    }
+
+    $bot_ban_ids = DatabaseHelper::fetch_all($conn, 'SELECT id FROM persons WHERE username=\'USLBot\'');
+
+    $blacklist_mods = array();
+    foreach($bot_ban_ids as $bbid) {
+        $blacklist_mods[] = array('i', $bbid);
+    }
+
+    $raw_actions = DatabaseHelper::fetch_all($conn, <<<SQL
+SELECT  max(usl_actions.id)+1 as big_id,
+        persons.username as username,
+        CONCAT(GROUP_CONCAT(DISTINCT hashtags.tag SEPARATOR ', '), ' from /r/', GROUP_CONCAT(monitored_subreddits.subreddit SEPARATOR ', /r/')) AS ban_reason,
+        min(handled_modactions.occurred_at) as banned_at
+FROM usl_actions
+JOIN persons ON persons.id = usl_actions.person_id
+JOIN usl_action_hashtags ON usl_action_hashtags.usl_action_id = usl_actions.id
+JOIN usl_action_ban_history ON usl_action_ban_history.usl_action_id = usl_actions.id
+JOIN ban_histories ON ban_histories.id = usl_action_ban_history.ban_history_id
+JOIN handled_modactions ON handled_modactions.id = ban_histories.handled_modaction_id
+JOIN monitored_subreddits ON monitored_subreddits.id = handled_modactions.monitored_subreddit_id
+JOIN hashtags ON hashtags.id = usl_action_hashtags.hashtag_id
+WHERE usl_action_hashtags.hashtag_id IN (?, ?, ?) AND ban_histories.mod_person_id NOT IN (?)
+    AND usl_actions.id > ? AND usl_actions.is_latest = 1 AND usl_actions.is_ban = 1
+    AND monitored_subreddits.read_only = 0
+GROUP BY persons.id
+LIMIT ?
+SQL
+    , $hashtag_params + $blacklist_mods + array(array('i', $start_id), array('i', $limit)));
+
+    // We will find the biggest id and strip it
+    $next_id = 0;
+    $new_actions = array();
+    foreach($raw_actions as $act) {
+        $new_actions[] = array('username' => $act->username, 'ban_reason' => $act->ban_reason, 'banned_at' => $act->banned_at);
+        if($act->big_id > $next_id) {
+            $next_id = $act->big_id;
+        }
+    }
+
+    echo_success(array('bans' => $new_actions, 'next_id' => $next_id));
     $conn->close();
     return;
-  }
-
-  // Now we loop through all the things
-
-  // Building the sql command
-  $sql =  'select ps.username, MIN(bh.ban_description), MIN(hma.occurred_at) from ban_histories bh ';
-  $sql .=     'inner join persons ps on bh.banned_person_id = ps.id ';
-  $sql .=     'inner join handled_modactions hma on bh.handled_modaction_id = hma.id ';
-  $sql .=     'where ';
-  $sql .=         'bh.banned_person_id not in (';
-  $sql .=             'select ubh.unbanned_person_id from unban_histories ubh ';
-  $sql .=                 'inner join handled_modactions uhma on ubh.handled_modaction_id = uhma.id ';
-  $sql .=                 'where ';
-  $sql .=                     'ubh.unbanned_person_id = bh.banned_person_id and ';
-  $sql .=                     'uhma.occurred_at > hma.occurred_at) and ';
-  $sql .=         'length(bh.ban_description) = (';
-  $sql .=             'select max(length(bh2.ban_description)) ';
-  $sql .=             'from ban_histories bh2 ';
-  $sql .=             'where bh2.banned_person_id = bh.banned_person_id ';
-  $sql .=         ') and ';
-  $sql .=         '(bh.ban_description like \'%#sketchy%\' or bh.ban_description like \'%#scammer%\' or bh.ban_description like \'%#troll%\') and ';
-  $sql .=         '(? is NULL or hma.occurred_at > ?) ';
-  $sql .=     'group by bh.banned_person_id ';
-  $sql .=     'limit ' . $offset . ', 250'; // This is safe since we only allow ints in the offset
-
-  // Running the sql command
-  check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
-  if($since !== null) {
-    $asstr = date('Y-m-d H:i:s', $since / 1000);
-    check_db_error($conn, $err_prefix, $stmt->bind_param('ss', $asstr, $asstr));
-  }else {
-    check_db_error($conn, $err_prefix, $stmt->bind_param('ss', $since, $since));
-  }
-  check_db_error($conn, $err_prefix, $stmt->execute());
-  check_db_error($conn, $err_prefix, $res = $stmt->get_result());
-
-  // Pushing the results to memory
-  while($row = $res->fetch_array()) {
-    $reason = $row[1];
-    if(substr($reason, 0, 7) === 'other: ') {
-      $reason = substr($reason, 7);
-    }
-
-    $result[] = array( 'username' => $row[0], 'ban_reason' => $reason, 'banned_at' => strtotime($row[2]) * 1000 ); 
-  }
-  $res->close();
-  $stmt->close();
-
-  echo_success($result);
-  $conn->close();
-  return;
 }else {
   echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a GET request at this endpoint');
 }
