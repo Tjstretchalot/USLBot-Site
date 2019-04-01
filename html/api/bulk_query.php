@@ -94,6 +94,12 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
         $blacklist_mods[] = array('i', $bbid);
     }
 
+    $all_params = array();
+    foreach($hashtag_params as $ht) { $all_params[] = $ht; }
+    foreach($blacklist_mods as $bm) { $all_params[] = $bm; }
+    $all_params[] = array('i', $start_id);
+    $all_params[] = array('i', $limit);
+
     $raw_actions = DatabaseHelper::fetch_all($conn, <<<SQL
 SELECT  max(usl_actions.id)+1 as big_id,
         persons.username as username,
@@ -113,7 +119,7 @@ WHERE usl_action_hashtags.hashtag_id IN (?, ?, ?) AND ban_histories.mod_person_i
 GROUP BY persons.id
 LIMIT ?
 SQL
-    , $hashtag_params + $blacklist_mods + array(array('i', $start_id), array('i', $limit)));
+    , $all_params);
 
     // We will find the biggest id and strip it
     $next_id = 0;
