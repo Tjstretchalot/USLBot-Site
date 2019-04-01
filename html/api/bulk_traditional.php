@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  * One-stop shop to fetch all traditional scammers.
  * Result: { success: true, data: [ { username: 'johndoe', traditional: true, ban_reason: 'grandfathered' }, ... ] }
