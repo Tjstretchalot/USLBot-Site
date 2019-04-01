@@ -104,7 +104,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 SELECT  max(usl_actions.id)+1 as big_id,
         persons.username as username,
         CONCAT(GROUP_CONCAT(DISTINCT hashtags.tag SEPARATOR ', '), ' from /r/', GROUP_CONCAT(monitored_subreddits.subreddit SEPARATOR ', /r/')) AS ban_reason,
-        min(handled_modactions.occurred_at) as banned_at
+        UNIX_TIMESTAMP(min(handled_modactions.occurred_at))*1000 as banned_at
 FROM usl_actions
 JOIN persons ON persons.id = usl_actions.person_id
 JOIN usl_action_hashtags ON usl_action_hashtags.usl_action_id = usl_actions.id
