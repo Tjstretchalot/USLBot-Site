@@ -91,7 +91,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $blacklist_mods = array();
     foreach($bot_ban_ids as $bbid) {
-        $blacklist_mods[] = array('i', $bbid);
+        $blacklist_mods[] = array('i', $bbid->id);
     }
 
     $all_params = array();
