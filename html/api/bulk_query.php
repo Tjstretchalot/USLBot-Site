@@ -117,6 +117,7 @@ WHERE usl_action_hashtags.hashtag_id IN (?, ?, ?) AND ban_histories.mod_person_i
     AND usl_actions.id > ? AND usl_actions.is_latest = 1 AND usl_actions.is_ban = 1
     AND monitored_subreddits.read_only = 0
 GROUP BY persons.id
+ORDER BY usl_actions.id
 LIMIT ?
 SQL
     , $all_params);
