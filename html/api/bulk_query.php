@@ -101,11 +101,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $all_params[] = array('i', $limit);
 
     $raw_actions = DatabaseHelper::fetch_all($conn, <<<SQL
-SELECT  max(uas.id)+1 as big_id,
+SELECT * FROM (SELECT max(uas.id)+1 as big_id,
         persons.username as username,
-        CONCAT(GROUP_CONCAT(DISTINCT hashtags.tag SEPARATOR ', '), ' from /r/', GROUP_CONCAT(monitored_subreddits.subreddit SEPARATOR ', /r/')) AS ban_reason,
+        GROUP_CONCAT(DISTINCT hashtags.tag SEPARATOR ', ') AS ban_reason,
         UNIX_TIMESTAMP(min(handled_modactions.occurred_at))*1000 as banned_at
-FROM (SELECT * FROM usl_actions ORDER BY id) uas
+FROM usl_actions as uas
 JOIN persons ON persons.id = uas.person_id
 JOIN usl_action_hashtags ON usl_action_hashtags.usl_action_id = uas.id
 JOIN usl_action_ban_history ON usl_action_ban_history.usl_action_id = uas.id
@@ -113,10 +113,10 @@ JOIN ban_histories ON ban_histories.id = usl_action_ban_history.ban_history_id
 JOIN handled_modactions ON handled_modactions.id = ban_histories.handled_modaction_id
 JOIN monitored_subreddits ON monitored_subreddits.id = handled_modactions.monitored_subreddit_id
 JOIN hashtags ON hashtags.id = usl_action_hashtags.hashtag_id
-WHERE usl_action_hashtags.hashtag_id IN (?, ?, ?) AND ban_histories.mod_person_id NOT IN (?)
+WHERE usl_action_hashtags.hashtag_id IN (?, ?, ?)
     AND uas.id > ? AND uas.is_latest = 1 AND uas.is_ban = 1
     AND monitored_subreddits.read_only = 0
-GROUP BY persons.id
+GROUP BY persons.id) as it ORDER BY it.big_id
 LIMIT ?
 SQL
     , $all_params);
