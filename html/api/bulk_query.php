@@ -101,7 +101,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $all_params[] = array('i', $limit);
 
     $raw_actions = DatabaseHelper::fetch_all($conn, <<<SQL
-SELECT  max(usl_actions.id)+1 as big_id,
+SELECT  max(uas.id)+1 as big_id,
         persons.username as username,
         CONCAT(GROUP_CONCAT(DISTINCT hashtags.tag SEPARATOR ', '), ' from /r/', GROUP_CONCAT(monitored_subreddits.subreddit SEPARATOR ', /r/')) AS ban_reason,
         UNIX_TIMESTAMP(min(handled_modactions.occurred_at))*1000 as banned_at
