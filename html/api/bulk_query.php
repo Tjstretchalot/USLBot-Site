@@ -105,7 +105,7 @@ SELECT  max(usl_actions.id)+1 as big_id,
         persons.username as username,
         CONCAT(GROUP_CONCAT(DISTINCT hashtags.tag SEPARATOR ', '), ' from /r/', GROUP_CONCAT(monitored_subreddits.subreddit SEPARATOR ', /r/')) AS ban_reason,
         UNIX_TIMESTAMP(min(handled_modactions.occurred_at))*1000 as banned_at
-FROM usl_actions
+FROM (SELECT * FROM usl_actions ORDER BY id)
 JOIN persons ON persons.id = usl_actions.person_id
 JOIN usl_action_hashtags ON usl_action_hashtags.usl_action_id = usl_actions.id
 JOIN usl_action_ban_history ON usl_action_ban_history.usl_action_id = usl_actions.id
@@ -117,7 +117,6 @@ WHERE usl_action_hashtags.hashtag_id IN (?, ?, ?) AND ban_histories.mod_person_i
     AND usl_actions.id > ? AND usl_actions.is_latest = 1 AND usl_actions.is_ban = 1
     AND monitored_subreddits.read_only = 0
 GROUP BY persons.id
-ORDER BY usl_actions.id
 LIMIT ?
 SQL
     , $all_params);
