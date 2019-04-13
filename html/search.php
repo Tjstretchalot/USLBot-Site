@@ -132,7 +132,7 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
       if($("#fallback-card").is(":visible")) {
         $("#fallback-card").slideUp('false');
       }
-      
+
       $("#output-simple").slideUp('fast');
       if(!data.data.grandfathered) {
         $("#output-grandfathered").slideUp('fast');
@@ -180,9 +180,7 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
     });
     <?php endif; ?>
 
-    $("#search-form").on('submit', function(e) {
-      e.preventDefault();
-
+    function doSearch() {
       var hashtags = [];
       if($("#scammer-checkbox").is(":checked")) {
         hashtags.push("#scammer");
@@ -248,6 +246,19 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
           });
         }
       });
+    };
+
+    $("#search-form").on('submit', function(e) {
+      e.preventDefault();
+      doSearch();
+    });
+
+    $(function() {
+      var urlParams = new URLSearchParams(window.location.search);
+      if(urlParams.has('username')) {
+        $("#search-for").val(urlParams.get('username'));
+        doSearch();
+      }
     });
     </script>
   </body>
