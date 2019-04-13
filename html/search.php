@@ -256,7 +256,7 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
     $(function() {
       var urlParams = new URLSearchParams(window.location.search);
       if(urlParams.has('username')) {
-        $("#search-for").val(urlParams.get('username'));
+        $("#search_for").val(urlParams.get('username'));
         doSearch();
       }
     });
