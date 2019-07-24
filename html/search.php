@@ -253,6 +253,10 @@ $all_auth = ($auth_level >= $MODERATOR_PERMISSION);
       doSearch();
     });
 
+    $("#detailed-checkbox").on('change', function(e) {
+      doSearch();
+    });
+
     $(function() {
       var urlParams = new URLSearchParams(window.location.search);
       if(urlParams.has('username')) {
