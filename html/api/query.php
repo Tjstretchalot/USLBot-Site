@@ -77,7 +77,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   for($i = 0; $i < strlen($query); $i++) {
     $c = $query[$i];
-    if(!ctype_alnum($c) && $c !== '-' && $c !== '_' && $c !== '%') {
+    if(!ctype_alnum($c) && $c !== '-' && $c !== '_' && $c !== '%' && $c !== '\\') {
       echo_fail(400, 'ARGUMENT_INVALID', 'Invalid parameter query; has invalid character \'' . $c . '\'');
       return;
     }
