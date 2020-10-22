@@ -120,7 +120,7 @@ SQL;
   if($newer_unban !== null) {
     echo_success(array('username' => $person->username, 'banned' => false, 'found' => true));
   }else {
-    if(strpos($latest_ban->ban_details, 'permanent') !== false) {
+    if(strpos($latest_ban->ban_details, 'permanent') === false) {
       // One of two formats: XX days or changed to XX days
       if(preg_match('/(^|\W)(\d+) days/', $latest_ban->ban_details, $matches) === 1) {
         $ban_duration_days = intval($matches[2]);
