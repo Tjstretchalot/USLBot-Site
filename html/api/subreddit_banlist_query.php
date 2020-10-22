@@ -55,7 +55,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   /* VALIDATING AUTHORIZATION */
   include_once('pagestart.php');
   if($logged_in_person === null) {
-    echo_fail(403, 'Authentication is required for this endpoint');
+    echo_fail(403, 'FORBIDDEN', 'Authentication is required for this endpoint');
     $conn->close();
     return;
   }
@@ -120,6 +120,18 @@ SQL;
   if($newer_unban !== null) {
     echo_success(array('username' => $person->username, 'banned' => false, 'found' => true));
   }else {
+    if($latest_ban->ban_details !== "permanent" && $latest_ban->ban_details !== "changed to permanent") {
+      // One of two formats: XX days or changed to XX days
+      if(preg_match('/(^|\W)(\d+) days/', $latest_ban->ban_details, $matches) === 1) {
+        $ban_duration_days = intval($matches[2]);
+        $ban_duration_seconds = 86400 * $ban_duration_days;
+        $ban_finished_at = $latest_ban->occurred_at + $ban_duration_seconds;
+        if($ban_finished_at < time()) {
+          echo_success(array('username' => $person->username, 'banned' => false, 'found' => true));
+          return;
+        }
+      }
+    }
     echo_success(array(
       'username' => $person->username,
       'banned' => true,
