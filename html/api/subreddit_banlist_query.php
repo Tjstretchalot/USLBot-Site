@@ -125,8 +125,13 @@ SQL;
       if(preg_match('/(^|\W)(\d+) days/', $latest_ban->ban_details, $matches) === 1) {
         $ban_duration_days = intval($matches[2]);
         $ban_duration_seconds = 86400 * $ban_duration_days;
-        $ban_finished_at = $latest_ban->occurred_at + $ban_duration_seconds;
-        if($ban_finished_at < time() * 1000) {
+        $ban_finished_at = $latest_ban->occurred_at + $ban_duration_seconds * 1000;
+        $curtimeUnixMS = time() * 1000;
+        if($ban_finished_at < $curtimeUnixMS) {
+          header('Original-Occurred-At: ' . strval($latest_ban->occurred_at));
+          header('Original-Ban-Details: ' . $latest_ban->ban_details);
+          header('Ban-Finished-At: ' . strval($ban_finished_at));
+          header('Current-Unix-MS: ' . strval($curtimeUnixMS));
           echo_success(array('username' => $person->username, 'banned' => false, 'found' => true));
           $conn->close();
           return;
