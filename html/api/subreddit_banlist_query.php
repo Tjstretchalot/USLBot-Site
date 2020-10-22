@@ -126,8 +126,9 @@ SQL;
         $ban_duration_days = intval($matches[2]);
         $ban_duration_seconds = 86400 * $ban_duration_days;
         $ban_finished_at = $latest_ban->occurred_at + $ban_duration_seconds;
-        if($ban_finished_at < time()) {
+        if($ban_finished_at < time() * 1000) {
           echo_success(array('username' => $person->username, 'banned' => false, 'found' => true));
+          $conn->close();
           return;
         }
       }
