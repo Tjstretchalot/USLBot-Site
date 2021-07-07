@@ -601,6 +601,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($debug === 1) {
       debug_echo('return ' . print_r($res, true));
       debug_echo('jsonified that is ' . json_encode($res));
+      debug_echo('last json error: ' . json_last_error_msg());
     }
     echo_success($res);
     $conn->close();
