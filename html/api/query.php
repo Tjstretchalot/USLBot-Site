@@ -599,7 +599,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     fetch_subs_ubh($conn, $unban_history);
     $res = array('person' => $person->username, 'grandfathered' => false, 'history' => create_combined($ban_history, $unban_history));
     if ($debug === 1) {
-      debug_echo('return ' . strval($res));
+      debug_echo('return ' . print_r($res, true));
     }
     echo_success($res);
     $conn->close();
