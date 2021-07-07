@@ -76,7 +76,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   function debug_echo($msg) {
     global $debug;
     if ($debug === 1) {
-      echo($msg . '\n');
+      echo($msg . "\n");
     }
   }
 
