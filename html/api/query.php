@@ -542,10 +542,15 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $comb = array();
 
     foreach($filt_bhs as $bh) {
+      $desc = $bh['bh']['ban_description'];
+      if(!mb_check_encoding($desc, 'UTF-8')) {
+        $desc = mb_convert_encoding($desc, 'UTF-8', 'UTF-8');
+      }
+
       $comb[] = array(
         'kind' => 'ban',
         'subreddit' => $bh['sub']['subreddit'],
-        'description' => $bh['bh']['ban_description'],
+        'description' => $desc,
         'details' => $bh['bh']['ban_details'],
         'time' => strtotime($bh['hma']['occurred_at'])
       );
@@ -602,7 +607,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       debug_echo('return ' . print_r($res, true));
       debug_echo('jsonified that is ' . json_encode($res));
       debug_echo('last json error: ' . json_last_error_msg());
-      debug_echo('jsonify with substitute bad utf-8: ' . json_encode($res, JSON_INVALID_UTF8_SUBSTITUTE));
+      debug_echo('jsonify with unescaped unicode: ' . json_encode($res, JSON_UNESCAPED_UNICODE));
       debug_echo('last json error: ' . json_last_error_msg());
     }
     echo_success($res);
