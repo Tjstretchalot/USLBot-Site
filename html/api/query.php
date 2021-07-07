@@ -600,6 +600,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $res = array('person' => $person->username, 'grandfathered' => false, 'history' => create_combined($ban_history, $unban_history));
     if ($debug === 1) {
       debug_echo('return ' . print_r($res, true));
+      debug_echo('jsonified that is ' . json_encode($res));
     }
     echo_success($res);
     $conn->close();
