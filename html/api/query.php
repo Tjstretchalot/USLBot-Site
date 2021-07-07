@@ -602,7 +602,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       debug_echo('return ' . print_r($res, true));
       debug_echo('jsonified that is ' . json_encode($res));
       debug_echo('last json error: ' . json_last_error_msg());
-      debug_echo('jsonify with mb_convert_encoding: ' . json_encode(mb_convert_encoding($res, 'UTF-8', 'UTF-8')));
+      debug_echo('jsonify with substitute bad utf-8: ' . json_encode($res, JSON_INVALID_UTF8_SUBSTITUTE));
       debug_echo('last json error: ' . json_last_error_msg());
     }
     echo_success($res);
