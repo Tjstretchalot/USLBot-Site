@@ -31,6 +31,13 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   // using a mysql LIKE, so it supports % wildcards
   $query = null;
 
+  /*
+  * Debug options:
+  *  0: No debugging
+  *  1: Debugging enabled (will clutter output)
+  */
+  $debug = 0;
+
   /* PARSING ARGUMENTS */
 
   if(isset($_GET['format']) && is_numeric($_GET['format'])) {
@@ -58,17 +65,38 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
   }
 
+  if(isset($_GET['debug'])) {
+    $_debug = intval($_GET['debug']);
+
+    if($_debug === 0 || $_debug === 1) {
+      $debug = $_debug;
+    }
+  }
+
+  function debug_echo($msg) {
+    global $debug;
+    if ($debug === 1) {
+      echo($msg . '\n');
+    }
+  }
+
   /* VALIDATING ARGUMENTS */
+
+  debug_echo('validating format...');
 
   if($format !== 1 && $format !== 2) {
     echo_fail(400, 'ARGUMENT_MISSING', 'Missing or invalid parameter format');
     return;
   }
 
+  debug_echo('validating hashtags...');
+
   if($hashtags === null || count($hashtags) === 0) {
     echo_fail(400, 'ARGUMENT_MISSING', 'Missing or invalid parameter hashtags (maximum 5 tags can be specified)');
     return;
   }
+
+  debug_echo('validating query...');
 
   if($query === null || strlen($query) < 3) {
     echo_fail(400, 'ARGUMENT_MISSING', 'Missing or invalid parameter query (minimum 3 characters)');
@@ -85,7 +113,13 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   /* VALIDATING AUTHORIZATION */
 
+  debug_echo('validating authorization...');
+
   $required_auth = -1;
+
+  if ($debug === 1) {
+    $required_auth = max($required_auth, $MODERATOR_PERMISSION);
+  }
 
   foreach($hashtags as $tag) {
     if(!in_array($tag, $NON_MODERATOR_HASHTAGS)) {
@@ -108,10 +142,14 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   /* PERFORMING REQUEST */
 
+  debug_echo('performing request...');
+
   // Fetching the person
+  debug_echo('fetching the person...');
   $person = PersonMapping::fetch_strict_then_like_username($conn, $query);
 
   if($person === null) {
+    debug_echo('did not find a person');
     if($format === 1) {
       echo_success(array( 'person' => str_replace('%', '', $query), 'banned' => false));
       $conn->close();
@@ -123,10 +161,12 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
   }
 
+  debug_echo('found a person');
   $is_searching_all = in_array('all', $hashtags);
 
   // Getting the traditional scammer list information
   $sql = 'SELECT * FROM traditional_scammers WHERE person_id=?';
+  debug_echo('preparing ' . $sql);
   check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
   check_db_error($conn, $err_prefix, $stmt->bind_param('i', $person->id));
   check_db_error($conn, $err_prefix, $stmt->execute());
@@ -134,17 +174,26 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $row = $res->fetch_assoc();
   $res->close();
   $stmt->close();
+  debug_echo('executed ' . $sql);
   if($row !== null) {
+    debug_echo('this person is a traditional scammer, checking if any relevant hashtags');
     $meets_reqs = $is_searching_all;
+    if ($meets_reqs) {
+      debug_echo('  nevermind, searching all');
+    }
+
     if(!$meets_reqs) {
       foreach($hashtags as $tag) {
         if(strpos($row['description'], $tag) !== false) {
           $meets_reqs = true;
+          debug_echo('matches on ' . $tag);
           break;
         }
       }
     }
+
     if($meets_reqs) {
+      debug_echo('returning traditional scammer');
       $conn->close();
       if($format === 1) {
         echo_success(array( 'person' => $person->username, 'banned' => true, 'reason' => $row['description']));
@@ -154,14 +203,17 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
         return;
       }
     }
+    debug_echo('ignoring traditional scammer; irrelevant');
   }
 
   // Getting all ban histories, unfiltered
   $sql = 'SELECT * FROM ban_histories WHERE banned_person_id=?';
+  debug_echo('preparing ' . $sql);
   check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
   check_db_error($conn, $err_prefix, $stmt->bind_param('i', $person->id));
   check_db_error($conn, $err_prefix, $stmt->execute());
   check_db_error($conn, $err_prefix, $res = $stmt->get_result());
+  debug_echo('executed ' . $sql);
 
   $ban_history = array();
 
@@ -171,6 +223,8 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   $res->close();
   $stmt->close();
+
+  debug_echo('got ' . count($ban_history) . ' rows');
 
   // Returning if there is no bans, unless we're searching for all (in
   // which case we should return unpaired unbans)
@@ -186,7 +240,9 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
   }
 
+
   // Fetching the corresponding handled_mod_action for the ban histories
+  debug_echo('Fetching corresponding hmas...');
   foreach($ban_history as $bh) {
     $sql = 'SELECT * FROM handled_modactions WHERE id=?';
     check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
@@ -204,12 +260,14 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $res->close();
     $stmt->close();
   }
+  debug_echo('Found all matching hmas!');
 
   // Cleansing the ban_history of any bans that don't meet the search
   // criteria, and keeping track of the ones we removed
   $invalid_bhs = array();
   $changed_bhs = array();
   if(!$is_searching_all) {
+    debug_echo('Cleaning irrelevant ban histories...');
     $valid_bhs = array();
     foreach($ban_history as $bh) {
       if(substr($bh['bh']['ban_details'], 0, strlen('changed to')) === 'changed to') {
@@ -240,9 +298,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     $ban_history = $valid_bhs;
+    debug_echo('After cleaning ban history reduced to ' . count($ban_history));
   }
 
   // Assigned the changed_bhs to either invalid or valid bhs
+  debug_echo('assinging changed bhs');
   foreach($changed_bhs as $bh) {
     if($is_searching_all) {
       $valid_bhs[] = $bh;
@@ -283,6 +343,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
 
   // Fetching the unfiltered list of unban actions
+  debug_echo('fetching unfiltered unban actions...');
   $sql = 'SELECT * FROM unban_histories WHERE unbanned_person_id=?';
   check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
   check_db_error($conn, $err_prefix, $stmt->bind_param('i', $person->id));
@@ -298,8 +359,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
   $res->close();
   $stmt->close();
 
+  debug_echo('got ' . count($unban_history) . ' unban actions');
+
   // Fetching the corresponding handled_mod_action for the
   // unban histories
+  debug_echo('finding corresponding hmas...');
   foreach($unban_history as $ubh) {
     $sql = 'SELECT * FROM handled_modactions WHERE id=?';
     check_db_error($conn, $err_prefix, $stmt = $conn->prepare($sql));
@@ -317,6 +381,7 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     $res->close();
     $stmt->close();
   }
+  debug_echo('found all corresponding hmas');
 
   if($format === 1) {
     $is_prop_row = DatabaseHelper::fetch_one($conn, 'SELECT property_value FROM propagator_settings WHERE property_key=?',
@@ -433,29 +498,35 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
       return;
     }
 
+    debug_echo('checking latest usl action against person...');
     $action = DatabaseHelper::fetch_one($conn, 'SELECT id FROM usl_actions WHERE is_latest = 1 AND person_id = ? LIMIT 1',
       array(array('i', $person->id)));
     if($action === null) {
+      debug_echo('there is none; we are done');
       echo_success(array('person' => $person->username, 'banned' => false));
       $conn->close();
       return;
     }
 
+    debug_echo('found an action; checking tags...');
     $tags = DatabaseHelper::fetch_all($conn, join('', array(
       'SELECT hashtags.tag as tag FROM usl_action_hashtags ',
       'JOIN hashtags ON usl_action_hashtags.hashtag_id = hashtags.id ',
       'WHERE usl_action_hashtags.usl_action_id = ?'
     )), array(array('i', $action->id)));
+    debug_echo('found ' . count($tags) . ' tags..');
 
     $filtered_tags = array();
     foreach($tags as $tag) {
       $found = $is_searching_all || in_array($tag->tag, $hashtags);
       if($found) {
+        debug_echo('found relevant tag: ' . $tag->tag);
         $filtered_tags[] = $tag->tag;
       }
     }
 
     if(count($filtered_tags) === 0) {
+      debug_echo('no relevant tags');
       echo_success(array('person' => $person->username, 'banned' => false));
       $conn->close();
       return;
@@ -522,8 +593,11 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   // We can return if we're searching for all
   if($is_searching_all) {
+    debug_echo('fetch_subs_bh');
     fetch_subs_bh($conn, $ban_history);
+    debug_echo('fetch_subs_ubh');
     fetch_subs_ubh($conn, $unban_history);
+    debug_echo('return');
     echo_success(array('person' => $person->username, 'grandfathered' => false, 'history' => create_combined($ban_history, $unban_history)));
     $conn->close();
     return;
