@@ -12,7 +12,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   /* PARSING ARGUMENTS */
   if(isset($_POST['id']) && is_numeric($_POST['id'])) {
     $_id = intval($_POST['id']);
-    if($_id > 0 && $_id < 100000) {
+    if($_id > 0 && $_id < 10000000) {
       $id = $_id;
     }
   }
@@ -49,7 +49,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
   $token_err_type = 'TOKEN_INVALID';
   $token_err_mess = 'The provided token does not match our records. The link might be malformed, the token might be expired, or the token may have already been used';
 
-  $conn = create_db_connection(); 
+  $conn = create_db_connection();
   $person = PersonMapping::fetch_by_id($conn, $id);
   if($person === null) {
     error_log('Person is null for ID ' . $id);
@@ -101,4 +101,3 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 }else {
   echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a POST request at this endpoint');
 }
-?>
