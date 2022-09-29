@@ -13,6 +13,12 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     return;
   }
 
+  if (strcasecmp($logged_in_person->username, "Handicapreader") === 0) {
+    echo_fail(403, 'UNAUTHORIZED', 'Handicapreader is not allowed to request temporary authorization');
+    $conn->close();
+    return;
+  }
+
   $request = TemporaryAuthorizationRequestMapping::fetch_by_person_id($conn, $logged_in_person->id);
 
   if($request !== null) {
@@ -27,4 +33,3 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 }else {
   echo_fail(405, 'METHOD_NOT_ALLOWED', 'You must use a GET request at this endpoint');
 }
-?>
